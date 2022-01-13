@@ -1,0 +1,5 @@
+---
+title: "Chapter 2: Introduction to NumPy"
+output: html_notebook
+---
+

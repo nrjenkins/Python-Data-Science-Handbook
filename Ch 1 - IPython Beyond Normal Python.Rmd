@@ -1,0 +1,239 @@
+---
+title: "Chapter 1: IPython: Beyond Normal Python"
+output: html_notebook
+---
+
+# Shell or Notebook
+
+IPython is closely related to Jupyter.
+
+## Launching the IPython Shell
+
+You launch the IPython interpreter by typing `ipython` in the command-line.
+
+## Launching the Jupyter Notebook
+
+The Jupyter notebook is a browser-based graphical interface to the IPython shell, and builds on it a rich set of dynamic display capabilities.
+
+You can launch Jupyter by typing `jypyter notebook` in the shell.
+
+# Help and Documentation in IPython
+
+Being able to search for answers is a skill that is important to learn.
+
+> Being an effective practitioner of data science is less about memorizing the tool or command you should use for every possible situation, and more about learning to effectively find the information you don't know, whether through a web search engine or another means.
+
+Examples of questions that IPython can help answer in a few keystrokes:
+
+-   How do I call this function? What arguments and options does it have?
+
+-   What does the course code of this Python object look like?
+
+-   What is in the package I imported? What attributes or methods does this object have?
+
+The `?` character is used to explore documentation and the `??` characters explore the source code.
+
+## Accessing Documentation with `?`
+
+Every Python object contains a reference to a string, known as a *doc string*, which in most cases will contain a concise summary of the object and how to use it. Python has a built-in `help()` function that can access this information and prints the results. For example, to see the documentation of the built-in `len` function, you can do the following:
+
+```{python}
+help(len)
+```
+
+The `?` is shorthand for accessing this information:
+
+```{python}
+len?
+```
+
+This even works for object methods:
+
+```{python}
+L = [1, 2, 3]
+L.insert?
+```
+
+and objects themselves:
+
+```{python}
+L?
+```
+
+## Accessing Source Code with `??`
+
+```{python}
+square??
+```
+
+## Exploring Modules with Tab-Completion
+
+### Tab-completion of object contents
+
+Every Python object have various attributes and methods associated with it. Like the `help` function, Python has built-in `dir` functions that returns a list of these, but the tab completions is much easier in practice.
+
+```{python}
+L.
+```
+
+You can narrow the list by typing in a few characters.
+
+```{python}
+L.count()
+```
+
+Private methods and special methods are listed with `__` and end with `__`.
+
+### Tab completion when importing
+
+Tab completion is also helpful when importing objects from packages.
+
+```{python}
+from itertools import combinations
+```
+
+You can also use tab completion to see which imports are available on you system:
+
+```{python}
+import #<tab>
+```
+
+### Beyond tab completion: wildcard matching
+
+You can match wildcards with `*`. For example, we can use this to list every object in the namespace that ends with `Warning`:
+
+```{python}
+*Warning?
+```
+
+If we are looking for a string method that contains the word `find` we can search for it this way:
+
+```{python}
+str.*find*?
+```
+
+# Keyboard Shortcuts in the IPython Shell
+
+# IPython Magic Commands
+
+Magic commands adds to normal Python syntax and are prefaced with `%`. They come in two options: *line magics* which operate on a single line input and are prefaced with a single `%`, and *cell magics* which operate on multiple lines of input and are denoted with two `%%`.
+
+## Pasting Code Blocks: `%paste` and `%cpaste`
+
+IPython's `%paste` function is designed to paste copied code with the correct format. `%cpaste` opens an interactive multiline prompt which you paste one or more chunks of code to be executed in a batch.
+
+## Running External Code: `%run`
+
+Instead of running code in a new window, you can run it within your IPython session with `%run`.
+
+## Timing Code Execution: `%timeit`
+
+`%timeit` will calculate the execution time of the single-line Python statement that follows it.
+
+# Input and Output History
+
+IPython exposes several ways to obtain the output of previous commands.
+
+## IPython's `In` and `Out` Objects
+
+The `In [1]:` / `Out[1]` give clues as to how you can access previous inputs and outputs in your current session. Imagine you start with something like this:
+
+```{python}
+import math
+
+math.sin(2)
+
+math.cos(2)
+```
+
+We could access these results in IPython like this:
+
+```{python, eval = FALSE}
+print(In)
+```
+
+## Underscore Shortcuts and Previous Outputs
+
+The variable `_` is kept updated with the previous output:
+
+```{python}
+print(_)
+```
+
+With IPython, you can use a double underscore `__` to access the second-to-last output and a triple underscore to access the third-to-last output:
+
+```{python, eval = FALSE}
+print(__)
+
+print(___)
+```
+
+## Suppressing Output
+
+You can suppress output by adding a semicolon to the end of a line `;`
+
+```{python}
+math.sin(2) + math.cos(2);
+```
+
+## Related Magic Commands
+
+For accessing a batch of previous inputs at once, the `%history` magic command is very helpful.
+
+# IPython and Shell Commands
+
+Anything in the IPython terminal that appears after `!` will be executed with the system command-line.
+
+## Quick Introduction to the Shell
+
+Here is an example of exploring, creating, and modifying directories with the Shell:
+
+```{bash}
+echo "hello world" # similar to print()
+
+pwd # print working directory
+
+ls # list working directory
+
+cd projects/ # change directory
+
+mkdir myproject # make noew directory
+
+cd myproject/
+
+pwd
+
+mv ../myproject.txt ./ # move file from one directory (../) to the current (./)
+```
+
+## Shell Commands in IPython
+
+You can use these commands in IPython by adding the `!` as a prefix.
+
+## Passing Values to and from the Shell
+
+You can save the contents of shell commands to Python objects with assignment. Going from Python to Shell is possible with the `{varname}` syntax.
+
+## Shell-Related Magic Commands
+
+Sometimes Shell commands need to be passed with `%` instead of `!`.
+
+# Errors and Debugging
+
+## Controlling Exceptions: `%xmode`
+
+When a Python script fails it will raise an Exception. Information about what caused the error can be found in the *traceback*. `%xmode` allows you to control how much information is printed when the exception is raised.
+
+## Debugging: When Reading Traceback Is Not Enough
+
+The standard tool for interactive debugging is `pdb`. The IPython-enhanced version of this is `ipdb`. A convenient interface to debug is the `%debug` magic command.
+
+# Profiling and Timing Code
+
+## Timing Code Snippets: `%timeit` and `%time`
+
+## Profiling Full Scripts: `%prun`
+
+## Line-By-Line Profiling with `%lprun`
+
+## Profiling Memory Use: `%memit` and `%mprun`

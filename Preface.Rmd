@@ -1,0 +1,8 @@
+---
+title: "Preface"
+output: html_notebook
+---
+
+# What is Data Science?
+
+Data science comprises three distinct and overlapping areas: the skills of a statistitian who know how to model and summarize datasets, the skills of a computer scientist who can design and use algorithms to efficient;y store, process and visualize this data; and the domain expertise necessary both to formulate the right questions and to put their answers in context.
