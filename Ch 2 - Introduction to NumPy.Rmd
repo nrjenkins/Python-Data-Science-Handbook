@@ -3,3 +3,1517 @@ title: "Chapter 2: Introduction to NumPy"
 output: html_notebook
 ---
 
+NumPy provides an efficient interface to store and operate on dense data buffers. NumPy arrays are like Python's built-in `list` type, but NumPy arrays provide much more efficient storage and data operations as the arrays grow larger in size.
+
+```{python}
+import numpy
+numpy.__version__
+```
+
+By convention, most people will import NumPy using `np` as an alias:
+
+```{python}
+import numpy as np
+```
+
+## Reminder about Built-In Documentation
+
+You can use tab completion to explore the contents of a package and `?` to display built-in documentation.
+
+# Understanding Data Types in Python
+
+Effective data science and computation requires understanding how data is stored and manipulated.
+
+Python is a dynamically typed language.
+
+## A Python Integer Is More Than Just an Integer
+
+When we define an integer in Python, it's actually a pointer to a compound C structure, which contains several values. A single integer contains four pieces:
+
+-   `ob_refcnt`, a reference count that helps Python silently handle memory allocation and deallocation
+
+-   `ob_type`, which encodes the type of the variable
+
+-   `ob_size`, which specifies the size of the following data members
+
+-   `ob_digit`, which contains the actual integer value that we expect the Python variable to represent
+
+## A Python List Is More Than Just a List
+
+The standard mutable multi-element container in Python is the list. We create a list of integers as follows:
+
+```{python}
+L = list(range(10))
+L
+
+type(L[0])
+```
+
+Or, similarly, a list of strings:
+
+```{python}
+L2 = [str(c) for c in L]
+L2
+```
+
+## Fixed-Type Arrays in Python
+
+The built-in `array` module can be used to create dense arrays of a uniform type:
+
+```{python}
+import array
+
+L = list(range(10))
+A = array.array("i", L)
+A
+```
+
+Here `i` is a type code indicating the contents are integers. `ndarray` objects are more useful because it adds efficient operations on the data. Here is how we create a NumPy array:
+
+```{python}
+import numpy as np
+```
+
+## Creating Arrays from Python Lists
+
+First, we can use `np.array` to create arrays from Python lists:
+
+```{python}
+np.array([1, 4, 2, 5, 3])
+```
+
+NumPy arrays are constrained to only contain the same type. If the types do not match, NumPy will upcast to make them all the same. We can set the data type with the `dtype` keyword:
+
+```{python}
+np.array([1, 2, 3, 4], dtype = "float32")
+```
+
+NumPy arrays can also be multi-dimensional:
+
+```{python}
+np.array([range(i, i + 3) for i in [2, 4, 6]])
+```
+
+## Creating Arrays from Scratch
+
+For larger arrays it can be more efficient to create arrays from scratch using routines built into NumPy.
+
+```{python}
+# create a length-10 integer array filled with zeros
+np.zeros(10, dtype = int)
+
+# create a 3x5 floating-point array filled with ones
+np.ones((3, 5), dtype = float)
+
+# create a 3x5 array filled with 3.14
+np.full((3, 5), 3.14)
+
+# create an array filled with a linear sequence starting at 0,
+# ending at 20, stepping by 2
+np.arange(0, 20, 2)
+
+# create an array of five values evenly spaced between 0 and 1
+np.linspace(0, 1, 5)
+
+# create a 3x3 array of uniformly distributed random values between 0 and 1
+np.random.random((3, 3))
+
+# Create a 3x3 array of normally distributed random values with mean 0 and sd 1
+np.random.normal(0, 1, (3, 3))
+
+# create a 3x3 array of random integers in the interval [0, 10)
+np.random.randint(0, 10, (3, 3))
+
+# create a 3x3 indentity matrix
+np.eye(3)
+
+# create a uninitialized array of three integers
+# the values will be whatever happens to already exist at that memory location
+np.empty(3)
+```
+
+## NumPy Standard Data Types
+
+NumPy arrays contain values of a single type, so it is important to have detailed knowledge of these types and their limitations.
+
++--------------+------------------------------------------------------------------------------------+
+| Data type    | Description                                                                        |
++:=============+:===================================================================================+
+| `bool_`      | Boolean (True or False) stored as a byte                                           |
++--------------+------------------------------------------------------------------------------------+
+| `int_`       | Default integer type (same as C `long`; normally either `int64` or `int32`)        |
++--------------+------------------------------------------------------------------------------------+
+| `intc`       | Identical to C `int` (normally `int32` or `int64`)                                 |
++--------------+------------------------------------------------------------------------------------+
+| `intp`       | Integer used for indexing (same as C `ssize_t`; normally either `int32`or `int64`) |
++--------------+------------------------------------------------------------------------------------+
+| `int8`       | Byte (-128 to 127)                                                                 |
++--------------+------------------------------------------------------------------------------------+
+| `int16`      | Integer (-32768 to 32767)                                                          |
++--------------+------------------------------------------------------------------------------------+
+| `int32`      | Integer (-2147483648 to 2147483647)                                                |
++--------------+------------------------------------------------------------------------------------+
+| `int64`      | Integer (-9223372036854775808 to 9223372036854775807)                              |
++--------------+------------------------------------------------------------------------------------+
+| `uint8`      | Unsigned integer (0 to 255)                                                        |
++--------------+------------------------------------------------------------------------------------+
+| `uint16`     | Unsigned integer (0 to 65535)                                                      |
++--------------+------------------------------------------------------------------------------------+
+| `uint32`     | Unsigned integer (0 to 4294967295)                                                 |
++--------------+------------------------------------------------------------------------------------+
+| `uint64`     | Unsigned integer (0 to 18446744073709551615)                                       |
++--------------+------------------------------------------------------------------------------------+
+| `float_`     | Shorthand for `float64`.                                                           |
++--------------+------------------------------------------------------------------------------------+
+| `float16`    | Half precision float: sign bit, 5 bits exponent, 10 bits mantissa                  |
++--------------+------------------------------------------------------------------------------------+
+| `float32`    | Single precision float: sign bit, 8 bits exponent, 23 bits mantissa                |
++--------------+------------------------------------------------------------------------------------+
+| `float64`    | Double precision float: sign bit, 11 bits exponent, 52 bits mantissa               |
++--------------+------------------------------------------------------------------------------------+
+| `complex_`   | Shorthand for `complex128`.                                                        |
++--------------+------------------------------------------------------------------------------------+
+| `complex64`  | Complex number, represented by two 32-bit floats                                   |
++--------------+------------------------------------------------------------------------------------+
+| `complex128` | Complex number, represented by two 64-bit floats                                   |
++--------------+------------------------------------------------------------------------------------+
+
+# The Basics of NumPy Arrays
+
+This section will cover these basic array manipulations:
+
+-   *Attributes of arrays*: Determining the size, shape, memory consumption, and data types of arrays
+
+-   *Indexing of arrays*: Getting and setting the value of individual array elements
+
+-   *Slicing of arrays*: Getting and setting smaller subarrays within a larger array
+
+-   *Reshaping of arrays*: Changing the shape of a given array
+
+-   *Joining and splitting of arrays*: Combining multiple arrays into one, and splitting one array into many
+
+## NumPy Array Attributes
+
+```{python}
+import numpy as np
+np.random.seed(0)
+
+x1 = np.random.randint(10, size = 6) # one-dimensional array
+x2 = np.random.randint(10, size = (3, 4)) # two-dimensional array
+x3 = np.random.randint(10, size = (3, 4, 5)) # three-dimensional array
+```
+
+Each array has attributes `ndim` (number of dimensions), `shape` (the size of each dimension), and `size` (the total size of the array:
+
+```{python}
+print("x3 ndim: ", x3.ndim)
+print("x3 shape: ", x3.shape)
+print("x3 size: ", x3.size)
+```
+
+Another useful attribute is the `dtype`, the data type of the array:
+
+```{python}
+print("dtype: ", x3.dtype)
+```
+
+Other attributes include `itemsize`, which lists the size of each array element, and `nbytes`, which lists the total size of the array:
+
+```{python}
+print("itemsize:", x3.itemsize, "bytes")
+print("nbytes:", x3.nbytes, "bytes")
+```
+
+## Array Indexing: Accessing Single Elements
+
+The $i^{th}$ value can be accessed by specifying the desired index in square brackets, just as with Python lists:
+
+```{python}
+x1
+
+x1[0]
+
+x1[4]
+```
+
+To index from the end of the array, you can use negative indices:
+
+```{python}
+x1[-1]
+
+x1[-2]
+```
+
+In a multi-dimensional array, items can be accessed using a comma-separated tuple of indicies:
+
+```{python}
+x2
+
+x2[0, 0]
+
+x2[2, 0]
+
+x2[2, -1]
+```
+
+Values can be modified using any of the above index notation:
+
+```{python}
+x2[0, 0] = 12
+x2
+```
+
+Keep in mind that NumPy arrays have a fixed type.
+
+## Array Slicing: Accessing Subarrays
+
+We can also use *slice* notation to access subarrays marked by the colon (`:`) character. The NumPy slicing syntax follows that of the standard Python list; to access a slice of an array `x`, use this:
+
+```{python, eval = FALSE}
+x[start:stop:step]
+```
+
+If any of these are unspecified, they default to the values `start = 0`, `stop = size of dimension`, `step = 1`. We'll take a look at accessing sub-arrays in one dimension and in multiple dimensions.
+
+### One-dimensional subarrays
+
+```{python}
+x = np.arange(10)
+x
+
+x[:5] # first five elements
+
+x[5:] # elements after index 5
+
+x[4:7] # middle sub-array
+
+x[::2] # every other element
+
+x[1::2] # every other element strating at index 1
+```
+
+When the `step` value is negative, the defaults for `start` and `stop` are swapped:
+
+```{python}
+x[::-1] # all elements, reversed
+
+x[5::-2] # reversed every other from index 5
+```
+
+### Multi-dimensional subarrays
+
+Multi-dimensional slices work the same way with multiple slices separated by commas:
+
+```{python}
+x2
+
+x2[:2, :3] # first 2 rows, first three columns
+
+x2[:3, ::2] # first 3 rows, every other column
+```
+
+Subarray dimensions can even be reversed together:
+
+```{python}
+x2[::-1, ::-1]
+```
+
+#### Accessing array rows and columns
+
+You can access a single row or column by using an empty slice marked by a single colon (`:`):
+
+```{python}
+print(x2[:, 0]) # first column of x2
+
+print(x2[0, :]) # first row of x2
+```
+
+### Subarrays as no-copy views
+
+Array slices return *views* rather than *copies* of the array data. Unlike with NumPy lists, with Python lists, slices will be copies.
+
+```{python}
+print(x2)
+```
+
+Let's extract a $2\times2$ subarray from this:
+
+```{python}
+x2_sub = x2[:2, :2]
+print(x2_sub)
+```
+
+Now, if we modify this subarray, we'll see that the original array is changed:
+
+```{python}
+x2_sub[0, 0] = 99
+print(x2_sub)
+
+print(x2)
+```
+
+This means that when we work with large datasets, we can access and process pieces of these datasets without the need to copy the underlying data buffer.
+
+### Creating copies of arrays
+
+To create a copy we use the `.copy()` method:
+
+```{python}
+x2_sub_copy = x2[:2, :2].copy()
+print(x2_sub_copy)
+```
+
+Now when we modify the sub array, the original is not touched:
+
+```{python}
+x2_sub_copy[0, 0] = 42
+print(x2_sub_copy)
+
+print(x2)
+```
+
+## Reshaping of Arrays
+
+The most flexible way to reshape arrays is with the `reshape` method. For example, if you want to put the numbers 1 through 9 in a $3\times3$ grid, you can do the following:
+
+```{python}
+grid = np.arange(1, 10).reshape((3, 3))
+grid
+```
+
+For this to work, the size of the initial array must match the size of the reshaped array. Where possible, the `reshape` method will use a no-copy view of the initial array, but with non-contiguous memory buffers this is not always the case.
+
+Another common reshaping pattern is the conversion of a one-dimensional array into a two-dimensional row or column matrix. This can be done with the reshape method, or more easily with the `newaxis` keyword within a slice operation:
+
+```{python}
+x = np.array([1, 2, 3])
+x
+
+# row vector via reshape
+x.reshape((1, 3))
+
+# row vector via newaxis
+x[np.newaxis, :]
+
+# column vector via reshape
+x.reshape((3, 1))
+
+# column vector via newaxis
+x[:, np.newaxis]
+```
+
+## Array Concatenation and Splitting
+
+### Concatenation of arrays
+
+Joining two arrays in NumPy is accomplished using the rountines `np.concatenate`, `np.vstack`, and `np.hstack`. `np.concatenate` takes a tuple or list of arrays as its first argument, as we can see here:
+
+```{python}
+x = np.array([1, 2, 3])
+y = np.array([3, 2, 1])
+
+np.concatenate([x, y])
+```
+
+You can also concatenate more that two arrays at once:
+
+```{python}
+z = [99, 99, 99]
+print(np.concatenate([x, y, z]))
+```
+
+It can also be used for two-dimensional arrays:
+
+```{python}
+grid = np.array([[1, 2, 3], [4, 5, 6]])
+
+# concatenate along the first axis
+np.concatenate([grid, grid])
+
+# concatenate along the second axis (zero-indexed)
+np.concatenate([grid, grid], axis = 1)
+```
+
+For working with arrays of mixed dimensions, it can be clearer to use the `np.vstack` (vertical stack) and `np.stack` (horizontal stack) functions:
+
+```{python}
+x = np.array([1, 2, 3])
+grid = np.array([[9, 8, 7], [6, 5, 4]])
+
+# vertical stack the arrays
+np.vstack([x, grid])
+
+# horizontally stack the arrays
+y = np.array([[99], [99]])
+
+np.hstack([grid, y])
+```
+
+### Splitting of arrays
+
+The opposite of concatenation is splitting, which is implemented by the functions `np.split`, `np.hsplit`, and `np.vsplit`. For each of these, we can pass a list of indicies giving the split points:
+
+```{python}
+x = [1, 2, 3, 99, 99, 3, 2, 1]
+x1, x2, x3 = np.split(x, [3, 5])
+print(x1, x2, x3)
+```
+
+*N* split-points leads to *N + 1* subarrays. The related functions `np.hsplit` and `np.vsplit` are similar:
+
+```{python}
+grid = np.arange(16).reshape((4, 4))
+grid
+
+upper, lower = np.vsplit(grid, [2])
+print(upper)
+print(lower)
+
+left, right = np.hsplit(grid, [2])
+print(left)
+print(right)
+```
+
+# Computation on NumPy Arrays: Universal Functions
+
+NumPy is fast because of its vectorized operations implemented through universal functions (ufuncs).
+
+## The Slowness of Loops
+
+Looping over arrays to operate on each element is slow in Python. For example, imagine we have an array of values and we'd like to compute the reciprocal of each:
+
+```{python}
+import numpy as np
+np.random.seed(0)
+
+def compute_reciprocals(values):
+  output = np.empty(len(values))
+  for i in range(len(values)):
+      output[i] = 1.0 / values[i]
+  return output
+
+values = np.random.randint(1, 10, size = 5)
+compute_reciprocals(values)
+```
+
+## Introducing UFuncs
+
+NumPy provides ways to run a routine like the one above as a vectorized operation.
+
+```{python}
+np.arange(5) / np.arange(1, 6)
+```
+
+## Exploring NumPy's UFuncs
+
+### Array arithmetic
+
+Addition, subtracting, multiplication, and division can also be used:
+
+```{python}
+x = np.arange(4)
+x
+
+print("x =", x)
+print("x + 5 =", x + 5)
+print("x - 5 =", x - 5)
+print("x * 2 =", x * 2)
+print("x / 2 =", x / 2)
+print("x // 2 =", x // 2) # floor division
+```
+
+There is also the `**` operator for exponentiation and the `%` operator for modulus:
+
+```{python}
+print("-x =", -x)
+print("x ** 2 =", x ** 2)
+print("x % 2 =", x % 2)
+```
+
+Here is a table of arithmetic operators in NumPy:
+
+| Operator | Equivalent ufunc  | Description                           |
+|:---------|:------------------|:--------------------------------------|
+| `+`      | `np.add`          | Addition (e.g., `1 + 1 = 2`)          |
+| `-`      | `np.subtract`     | Subtraction (e.g., `3 - 2 = 1`)       |
+| `-`      | `np.negative`     | Unary negation (e.g., `-2`)           |
+| `*`      | `np.multiply`     | Multiplication (e.g., `2 * 3 = 6`)    |
+| `/`      | `np.divide`       | Division (e.g., `3 / 2 = 1.5`)        |
+| `//`     | `np.floor_divide` | Floor division (e.g., `3 // 2 = 1`)   |
+| `**`     | `np.power`        | Exponentiation (e.g., `2 ** 3 = 8`)   |
+| `%`      | `np.mod`          | Modulus/remainder (e.g., `9 % 4 = 1`) |
+
+### Absolute value
+
+NumPy also has an absolute value function:
+
+```{python}
+x = np.array([-2, -1, 0, 1, 2])
+abs(x) # python's built-in function
+
+np.abs(x)
+```
+
+### Trigonometric functions
+
+```{python}
+theta = np.linspace(0, np.pi, 3)
+```
+
+Now we can compute some trigonometric functions on these values:
+
+```{python}
+print("theta =", theta)
+print("sin(theta) =", np.sin(theta))
+print("cos(theta) =", np.cos(theta))
+print("tan(theta) =", np.tan(theta))
+```
+
+Inverse trig functions are also an option:
+
+```{python}
+x = [-1, 0, 1]
+
+print("x =", x)
+print("arcsin(x) =", np.arcsin(x))
+print("arccos(x) =", np.arccos(x))
+print("arctan(x) =", np.arctan(x))
+```
+
+### Exponents and logarithms
+
+NumPy also have exponentials:
+
+```{python}
+x = [1, 2, 3]
+print("x     =", x)
+print("e^x   =", np.exp(x))
+print("2^x   =", np.exp2(x))
+print("3^x   =", np.power(3, x))
+```
+
+And logarithms:
+
+```{python}
+x = [1, 2, 4, 10]
+print("x        =", x)
+print("ln(x)    =", np.log(x))
+print("log2(x)  =", np.log2(x))
+print("log10(x) =", np.log10(x))
+```
+
+### Specialized ufuncs
+
+There are other ufuncs available and the `scip.special` submodule is another great resource for more advanced functions.
+
+```{python}
+from scipy import special
+
+# Gamma functions (generalized factorials) and related functions
+x = [1, 5, 10]
+print("gamma(x)     =", special.gamma(x))
+print("ln|gamma(x)| =", special.gammaln(x))
+print("beta(x, 2)   =", special.beta(x, 2))
+
+# Error function (integral of Gaussian)
+# its complement, and its inverse
+x = np.array([0, 0.3, 0.7, 1.0])
+print("erf(x)  =", special.erf(x))
+print("erfc(x) =", special.erfc(x))
+print("erfinv(x) =", special.erfinv(x))
+```
+
+## Advanced UFunc Features
+
+### Specifying output
+
+Sometimes it's useful to specify where a result should be stored. You can do this with the `out` argument:
+
+```{python}
+x = np.arange(5)
+y = np.empty(5)
+np.multiply(x, 10, out=y)
+print(y)
+
+y = np.zeros(10)
+y
+np.power(2, x, out=y[::2])
+print(y)
+```
+
+If we had written `y[::2] = 2 ** x` this would have resulted in the creation of a temporary array to hold the results of `2 ** x` followed by a second operation copying those values into the `y` array.
+
+### Aggregates
+
+Aggregates can be computed directly from the object. For example, if we'd like to reduce an array with a particular operation, we can use the `reduce` method of an ufunc. A reduce repeatedly applies a given operation to the elements of an array until only a single result remains.
+
+For example, calling `reduce` on the `add` ufunc returns the su of all elements in the array:
+
+```{python}
+x = np.arange(1, 6)
+x
+np.add.reduce(x)
+```
+
+Calling `reduce` on the `multiply` unfunc results in the product of all array elements:
+
+```{python}
+np.multiply.reduce(x)
+```
+
+To store all the intermediate results we can use `accumulate` instead:
+
+```{python}
+np.add.accumulate(x)
+
+np.multiply.accumulate(x)
+```
+
+### Outer products
+
+We can compute the output of all pairs on two different inputs using the `outer` method. You can use this to create something like a multiplication table:
+
+```{python}
+x = np.arange(1, 6)
+x
+np.multiply.outer(x, x)
+```
+
+# Aggregations: Min, Max, and Everything In Between
+
+## Summing the Values in an Array
+
+We can sum all values in an array in Python with the built-in `sum` function:
+
+```{python}
+import numpy as np
+
+L = np.random.random(100)
+sum(L)
+```
+
+Or we can use NumPy's `sum` function:
+
+```{python}
+np.sum(L)
+```
+
+The NumPy operation, however, works much more quickly.
+
+```{python eval = FALSE}
+big_array = np.random.rand(1000000)
+%timeit sum(big_array)
+%timeit np.sum(big_array)
+```
+
+## Minimum and Maximum
+
+Python also has built-in `min` and `max` functions:
+
+```{python}
+min(big_array), max(big_array)
+```
+
+But there are also NumPy equivalents:
+
+```{python}
+np.min(big_array), np.max(big_array)
+```
+
+The shorter syntax is to use methods of the array object itself:
+
+```{python}
+print(big_array.min(), big_array.max(), big_array.sum())
+```
+
+### Multi dimensional aggregates
+
+One common type of aggregation operation is an aggregate along a row or column. Say you have data in a two-dimensional array:
+
+```{python}
+M = np.random.random((3, 4))
+print(M)
+```
+
+By default, each NumPy aggregation will return the aggregate over the entire array:
+
+```{python}
+M.sum()
+```
+
+To account for the multidimensional nature of the data, we need to specify an `axis`. `axis = 0` will operate over columns:
+
+```{python}
+M.min(axis = 0)
+```
+
+`axis = 1` will operate over rows:
+
+```{python}
+M.max(axis = 1)
+```
+
+### Other aggregation functions
+
+NumPy also includes `NaN`-safe counterpart functions that compute the result while ignoring missing values. Here is a table of useful aggregation functions in NumPy:
+
+| Function Name   | NaN-safe Version   | Description                               |
+|:----------------|:-------------------|:------------------------------------------|
+| `np.sum`        | `np.nansum`        | Compute sum of elements                   |
+| `np.prod`       | `np.nanprod`       | Compute product of elements               |
+| `np.mean`       | `np.nanmean`       | Compute mean of elements                  |
+| `np.std`        | `np.nanstd`        | Compute standard deviation                |
+| `np.var`        | `np.nanvar`        | Compute variance                          |
+| `np.min`        | `np.nanmin`        | Find minimum value                        |
+| `np.max`        | `np.nanmax`        | Find maximum value                        |
+| `np.argmin`     | `np.nanargmin`     | Find index of minimum value               |
+| `np.argmax`     | `np.nanargmax`     | Find index of maximum value               |
+| `np.median`     | `np.nanmedian`     | Compute median of elements                |
+| `np.percentile` | `np.nanpercentile` | Compute rank-based statistics of elements |
+| `np.any`        | N/A                | Evaluate whether any elements are true    |
+| `np.all`        | N/A                | Evaluate whether all elements are true    |
+
+## Example: What is the Average Height of US Presidents?
+
+This data is available in the file `presidents_height.csv`.
+
+```{python}
+import pandas as pd
+
+data = pd.read_csv("https://raw.githubusercontent.com/jakevdp/PythonDataScienceHandbook/master/notebooks/data/president_heights.csv")
+
+heights = np.array(data["height(cm)"])
+print(heights)
+```
+
+Now we can compute several summary statistics:
+
+```{python}
+print("Mean height:       ", heights.mean())
+print("Standard deviation:", heights.std())
+print("Minimum height:    ", heights.min())
+print("Maximum height:    ", heights.max())
+```
+
+We might also want to compute quantiles:
+
+```{python}
+print("25th percentile:   ", np.percentile(heights, 25))
+print("Median:            ", np.median(heights))
+print("75th percentile:   ", np.percentile(heights, 75))
+```
+
+It might be better just to create a histogram:
+
+```{python}
+import matplotlib.pyplot as plt
+import seaborn; seaborn.set() # set plot style
+
+plt.hist(heights)
+plt.title("Height Distribution of US Presidents")
+plt.xlabel("Height (cm)")
+plt.ylabel("Number")
+plt.show()
+plt.clf()
+```
+
+# Computation on Arrays: Broadcasting
+
+NumPy's universal functions are used to vectorize operations and avoid Pythons slow loops. Another way to vectorize operations is to use NumPy's *broadcasting* functionality. Broadcasting is a set of rules for applying binary ufuncs on arrays of different sizes.
+
+## Introducing Broadcasting
+
+For arrays of the same size, binary operations are preformed on an element-by-element basis:
+
+```{python}
+import numpy as np
+
+a = np.array([0, 1, 2])
+b = np.array([5, 5, 5])
+a + b
+```
+
+Broadcasting allows these types of operations to be performed on arrays of different sizes. For example, we can add a scalar to an array:
+
+```{python}
+a + 5
+```
+
+Broadcasting can also take place in an array of higher dimension.
+
+```{python}
+M = np.ones((3, 3))
+M
+
+M + a
+```
+
+More complicated uses involve broadcasting of both arrays:
+
+```{python}
+a = np.arange(3)
+a
+
+b = np.arange(3)[:, np.newaxis]
+b
+
+a + b
+```
+
+In this example, both `a` and `b` were stretched to match a common shape. The geometry of these examples can be visualized like this:
+
+![](https://jakevdp.github.io/PythonDataScienceHandbook/figures/02.05-broadcasting.png)
+
+## Rules of Broadcasting
+
+Broadcasting follows a strict set of rules to determine the interaction between the two arrays:
+
+-   Rule 1: If the two arrays differ in their number of dimensions, the shape of the one with fewer dimensions is *padded* with ones on its leading left side.
+
+-   Rule 2: If the shape of the two arrays does not match in any dimension, the array with shape equal to 1 in that dimensions is stretched to match the other shape.
+
+-   Rule 3: If in any dimension the sizes disagree and neither is equal to 1, an error is raised.
+
+### Broadcasting example 1
+
+Let's look at adding a two-dimensional array to a one-dimensional array:
+
+```{python}
+M = np.ones((2, 3))
+a = np.arange(3)
+
+M + a
+```
+
+### Broadcasting example 2
+
+Let's take an example where both arrays need to be broadcast:
+
+```{python}
+a = np.arange(3).reshape((3, 1))
+a
+
+b = np.arange(3)
+b
+
+a + b
+```
+
+### Broadcasting example 3
+
+Now let's take a look at an example in which the two arrays are not compatible:
+
+```{python}
+M = np.ones((3, 2))
+M
+
+a = np.arange(3)
+a
+
+M + a
+```
+
+To make this work, we need to reshape the data.
+
+```{python}
+a[:, np.newaxis].shape
+
+M + a[:, np.newaxis].shape
+```
+
+## Broadcasting in Practice
+
+Here we look at a couple examples of where broadcasting is useful.
+
+### Centering an array
+
+Imagine you have a $10 \times 3$ array:
+
+```{python}
+x = np.random.random((10, 3))
+x
+```
+
+We can compute the mean of each feature using the `mean` aggregate across the first dimension:
+
+```{python}
+xmean = x.mean(0)
+xmean
+```
+
+Now we subtract the mean to center the array.
+
+```{python}
+x_centered = x - xmean
+x_centered
+```
+
+Now the mean of each row should be close to zero.
+
+```{python}
+x_centered.mean(0)
+```
+
+### Plotting a two-dimensional function
+
+If we want to define a function $z = f(x, y)$, broadcasting can be used to compute the function across the grid:
+
+```{python}
+# x and y have 50 steps from 0 to 5
+x = np.linspace(0, 5, 50)
+x
+
+y = np.linspace(0, 5, 50)[:, np.newaxis]
+y
+
+z = np.sin(x) ** 10 + np.cos(10 + y * x) * np.cos(x)
+
+plt.imshow(z, origin='lower', extent=[0, 5, 0, 5],
+           cmap='viridis')
+plt.colorbar();
+plt.show()
+plt.clf()
+```
+
+# Comparisons, Masks, and Boolean Logic
+
+Masking comes up when you want to extract, modify, count, or otherwise manipulate values in an array based on some criterion.
+
+## Example: Counting Rainy Days
+
+Imagine you have data on the amount of precipitation each day for a year in a given city. We'll load the daily rainfall stats for the city of Seattle in 2014 using Pandas:
+
+```{python}
+import numpy as np
+import pandas as pd
+
+rainfall = pd.read_csv("https://raw.githubusercontent.com/jakevdp/PythonDataScienceHandbook/master/notebooks/data/Seattle2014.csv")["PRCP"].values
+
+inches = rainfall / 254.0
+inches.shape
+```
+
+The array contains 365 values. Let's look at a histogram of rainy days.
+
+```{python}
+import matplotlib.pyplot as plt
+import seaborn; seaborn.set()
+
+plt.hist(inches, 40);
+plt.show()
+plt.clf()
+```
+
+Most of the days in Seattle had zero rainfall. But there are other questions to answer: how many rainy days were there in the year? What is the average precipitation on those rainy days? How many days were there with more than half an inch of rain?
+
+### Digging into the data
+
+The best way to investigate these questions is with Python's UFuncs.
+
+## Comparison Operators as ufuncs
+
+In addition to addition, subtraction, multiplication, and division, NumPy also implements comparison operators such as `<` and `>` greater than.
+
+```{python}
+x = np.array([1, 2, 3, 4, 5])
+x
+
+x < 3
+x > 3
+x <= 3
+x >= 3
+x != 3
+x == 3
+```
+
+We can also do an element-wise comparison of two arrays and include compound expressions:
+
+```{python}
+(2 * x) == (x ** 2)
+```
+
+Here is a table of comparison operators and their equivalent ufuncs:
+
+| Operator | Equivalent ufunc | Operator | Equivalent ufunc   |
+|:---------|:-----------------|:---------|:-------------------|
+| `==`     | `np.equal`       | `!=`     | `np.not_equal`     |
+| `<`      | `np.less`        | `<=`     | `np.less_equal`    |
+| `>`      | `np.greater`     | `>=`     | `np.greater_equal` |
+
+## Working with Boolean Arrays
+
+There are a host of useful operations you can do with Boolean arrays.
+
+```{python}
+rng = np.random.RandomState(0)
+x = rng.randint(10, size=(3, 4))
+x
+```
+
+### Counting entries
+
+To count the number of `True` entries in a Boolean array, `np.count_nonzero` is useful:
+
+```{python}
+# how many values less than 6?
+np.count_nonzero(x < 6)
+```
+
+Another way to get at this information is to use `np.sum`:
+
+```{python}
+np.sum(x < 6)
+```
+
+We can also calculate this sum across columns:
+
+```{python}
+# how many values less than 6 in each row?
+np.sum(x < 6, axis = 1)
+```
+
+If we're interested in quickly checking whether any or all the values are true, we can use `np.any` or `np.all`.
+
+```{python}
+# are there any values greater than 8?
+np.any(x > 8)
+
+# are there any values less than zero?
+np.any(x < 0)
+
+# are all valyes less than 10?
+np.all(x < 10)
+
+# are all values equal to 6?
+np.all(x == 6)
+```
+
+These functions can also be executed along particular axes.
+
+### Boolean operators
+
+What if we wanted to count all days with rain less than four inches and greater than one inch? This is accomplished through Python's *bitwise logic operators*, `&`, `|`, `^`, and `~`. For example, we can address this sort of compound question as follows:
+
+```{python}
+np.sum((inches > 0.5) & (inches < 1))
+```
+
+So there are 29 days with rainfall between 0.5 and 1 inch.
+
+Here are some other examples:
+
+```{python}
+print("Number days without rain:      ", np.sum(inches == 0))
+print("Number days with rain:         ", np.sum(inches != 0))
+print("Days with more than 0.5 inches:", np.sum(inches > 0.5))
+print("Rainy days with < 0.2 inches  :", np.sum((inches > 0) &
+                                                (inches < 0.2)))
+```
+
+## Boolean Array as Masks
+
+Suppose we want to find all values in the array that are less than 5:
+
+```{python}
+x
+```
+
+We can use a boolean condition like this:
+
+```{python}
+x < 5
+```
+
+To select these values from the array, we can index on this boolean array; this is known as a *masking* operation.
+
+```{python}
+x[x < 5]
+```
+
+With this, we can then operate on these values as we wish. For example:
+
+```{python}
+# construct a mask of all rainy days
+rainy = (inches > 0)
+
+# construct a mask of all summer days (June 21st is the 172nd day)
+days = np.arange(365)
+summer = (days > 172) & (days < 262)
+
+print("Median precip on rainy days in 2014 (inches):   ",
+      np.median(inches[rainy]))
+print("Median precip on summer days in 2014 (inches):  ",
+      np.median(inches[summer]))
+print("Maximum precip on summer days in 2014 (inches): ",
+      np.max(inches[summer]))
+print("Median precip on non-summer rainy days (inches):",
+      np.median(inches[rainy & ~summer]))
+```
+
+# Fancy Indexing
+
+Fancy indexing is like the simple indexing we've already seen, but we pass arrays of indices in place of single scalars. This allows us to quickly access and modify complicated subsets of an array's values.
+
+## Exploring Fancy Indexing
+
+Fancy indexing means passing an array of indices to access multiple array elements at once.
+
+```{python}
+import numpy as np
+rand = np.random.RandomState(42)
+
+x = rand.randint(100, size = 10)
+print(x)
+```
+
+Suppose we want to access three different elements. We could do it like this:
+
+```{python}
+[x[3], x[7], x[2]]
+```
+
+Or, we can pass a single list or array of indices to obtain the same result:
+
+```{python}
+ind = [3, 7, 4]
+x[ind]
+```
+
+When using fancy indexing, the shape of the result reflects the shape of the *index arrays* rather than the shape of the *array being indexed*:
+
+```{python}
+ind = np.array([[3, 7], [4, 5]])
+ind
+
+x[ind]
+```
+
+Fancy indexing also works in multiple dimensions:
+
+```{python}
+x = np.arange(12).reshape((3, 4))
+x
+```
+
+Like with standard indexing, the first index refers to the row, and the second to the column:
+
+```{python}
+row = np.array([0, 1, 2])
+row
+
+col = np.array([2, 1, 3])
+x[row, col]
+```
+
+## Combined Indexing
+
+Fancy indexing can be combined with the other indexing schemes we've seen:
+
+```{python}
+print(x)
+```
+
+We can combine fancy and simple indices:
+
+```{python}
+x[2, [2, 0, 1]]
+```
+
+We can also combine fancy indexing with slicing:
+
+```{python}
+x[1:, [2, 0, 1]]
+```
+
+And we can combine fancy indexing with masking:
+
+```{python}
+mask = np.array([1, 0, 1, 0], dtype = bool)
+x[row[:, np.newaxis], mask]
+```
+
+## Example: Selecting Random Points
+
+A common use of fancy indexing is selecting subsets ot rows from a matrix. For example, we might have an $N$ by $D$ matrix representing $N$ points in $D$ dimensions, such as the following points drawn from a two-dimensional normal distribution:
+
+```{python}
+mean = [0, 0]
+cov = [[1, 2], [2, 5]]
+x = rand.multivariate_normal(mean, cov, 100)
+x.shape
+```
+
+We can visualize these points as a scatter-plot:
+
+```{python}
+import matplotlib.pyplot as plt
+import seaborn; seaborn.set()
+
+plt.scatter(x[:, 0], x[:, 1])
+plt.show()
+plt.clf()
+```
+
+Let's use fancy indexing to select 20 random points.
+
+```{python}
+indices = np.random.choice(x.shape[0], 20, replace = False)
+indices
+
+selection = x[indices]
+selection.shape
+```
+
+Now we can see which points were selected:
+
+```{python}
+plt.scatter(x[:, 0], x[:, 1], alpha = 0.3)
+plt.scatter(selection[:, 0], selection[:, 1], facecolor = "none", s = 200)
+plt.show()
+plt.clf()
+```
+
+## Modifying Values with Fancy Indexing
+
+Imagine we have an array of indices and we'd like to set the corresponding items in an array to some value:
+
+```{python}
+x = np.arange(10)
+i = np.array([2, 1, 8, 4])
+x[i] = 99
+print(x)
+```
+
+We can use any assignment-type operator for this:
+
+```{python}
+x[i] -= 10
+print(x)
+```
+
+## Example: Binning Data
+
+You can use these tools to bin data to create a histogram.
+
+# Sorting Arrays
+
+A selection sort repeatedly finds the minimum value from a list, and makes swaps until the list is sorted.
+
+```{python}
+import numpy as np
+
+def selection_sort(x):
+    for i in range(len(x)):
+        swap = i + np.argmin(x[i])
+        (x[i], x[swap]) = (x[swap], x[i])
+    return x
+
+x = np.array([2, 1, 4, 3, 5])
+selection_sort(x)
+```
+
+## Fast Sorting in NumPy: `np.sort` and `np.argsort`
+
+To return a sorted version of the array without modifying the input, you can use `np.sort`:
+
+```{python}
+x = np.array([2, 1, 4, 3, 5])
+np.sort(x)
+```
+
+If you prefer to sort the array in-place, you can instead use the `sort` method of arrays:
+
+```{python}
+x.sort()
+x
+```
+
+A related function is `argsort`, which instead returns the *indices* of the sorted elements:
+
+```{python}
+x = np.array([2, 1, 4, 3, 5])
+i = np.argsort(x)
+print(i)
+```
+
+### Sorting along rows or columns
+
+NumPy can sort along specific rows or columns with the `axis` argument.
+
+```{python}
+rand = np.random.RandomState(42)
+x = rand.randint(0, 10, (4, 6))
+print(x)
+
+# sort each column of X
+np.sort(x, axis = 0)
+
+# sort each row of x
+np.sort(x, axis = 1)
+```
+
+## Partial Sorts: Partitioning
+
+Sometimes we just want to find the *k* smallest values in the array. We can do this with the `np.partition` function. `np.partition` takes an array and a number *k*; the result is a new array with the smallest *k* values to the left of the partition, and the remaining values to the right, in arbitrary order:
+
+```{python}
+x = np.array([7, 2, 3, 1, 6, 5, 4])
+np.partition(x, 3)
+```
+
+We can also partition along other axes:
+
+```{python}
+x = rand.randint(0, 10, (4, 6))
+np.partition(x, 2, axis = 1)
+```
+
+The result is an array where the first two slots in each row contain the smallest values from that row, with the remaining values filling the remaining slots.
+
+## Example: k-Nearest Neighbors
+
+Let's use the `argsort` function to find the nearest neighbors of each point in a set.
+
+```{python}
+# create a random set of 10 points
+x = rand.rand(10, 2)
+
+# scatter plot
+import matplotlib.pyplot as plt
+import seaborn
+plt.scatter(x[:, 0], x[:, 1], s = 100)
+plt.show()
+plt.clf()
+```
+
+Now compute the distance between each pair of points:
+
+```{python}
+dist_sq = np.sum((x[:, np.newaxis, :] - x[np.newaxis, :, :]) ** 2, axis = -1)
+```
+
+Let's break down this code:
+
+```{python}
+# for each pair of points, compute differences in their coordinates
+differences = x[:, np.newaxis, :] - x[np.newaxis, :, :]
+differences.shape
+
+# square the coordinate differences
+sq_differences = differences ** 2
+sq_differences.shape
+
+# sum the coordinate differences to get the squared distance
+dist_sq = sq_differences.sum(-1)
+dist_sq.shape
+```
+
+Now we use `np.argsort` to sort along each row.
+
+```{python}
+nearest = np.argsort(dist_sq, axis = 1)
+print(nearest)
+```
+
+If we only care about the nearest $k$ neighbors, all need is to partition each row so that the smallest $k + 1$ squared distances come first.
+
+```{python}
+k = 2
+nearest_partition = np.argpartition(dist_sq, k + 1, axis = 1)
+```
+
+We can plot the points to visualize this network of neighbors.
+
+```{python}
+plt.scatter(x[:, 0], x[:, 1], s = 100)
+
+k = 2
+
+for i in range(x.shape[0]):
+    for j in nearest_partition[i, :k + 1]:
+        # plot a line from x[i] to x[j]
+        # use some zip magic to make it happen:
+        plt.plot(*zip(x[j], x[i]), color = "black")
+
+plt.show()
+plt.clf()
+```
+
+# Structured Data: NumPy's Structured Arrays
+
+Imagine that we have several categories of data on a number of people, and we'd like to store these values for use in a Python program. It would be possible to store these in separate arrays:
+
+```{python}
+name = ['Alice', 'Bob', 'Cathy', 'Doug']
+age = [25, 45, 37, 19]
+weight = [55.0, 85.5, 68.0, 61.5]
+```
+
+But it would be more natural to use a single structure to store all of the data. This is what structured arrays are for.
+
+Previously, we created a structured array using a compound data type specification:
+
+```{python}
+x = np.zeros(4, dtype = int)
+```
+
+We can create structured arrays in a similar fashion:
+
+```{python}
+# use a compound data type for structured arrays
+data = np.zeros(4, dtype = {"names":("name", "age", "weight"),
+                            "formats":("U10", "i4", "f8")})
+print(data.dtype)
+```
+
+Now we can fill this empty container array with the list of values:
+
+```{python}
+data['name'] = name
+data['age'] = age
+data['weight'] = weight
+print(data)
+```
+
+Now we can refer to values either by indexing or by name:
+
+```{python}
+# get all names
+data["name"]
+
+# get first row of data
+data[0]
+
+# get the name from the last row
+data[-1]["name"]
+```
+
+With Boolean masking, we can also do things like filter on age:
+
+```{python}
+# get names where age is under 30
+data[data["age"] < 30]["name"]
+```
+
+## Creating Structured Arrays
+
+Structured array data types can be specified in a number of ways. Earlier, we saw the dictionary method:
+
+```{python}
+np.dtype({'names':('name', 'age', 'weight'),
+          'formats':('U10', 'i4', 'f8')})
+```
+
+If the names don't matter, we can just specify the types alone in a comma-separated string:
+
+```{python}
+np.dtype("S10, i4, f8")
+```
+
+## More Advanced Compound Types
+
+It is possible to define even more advanced compound types.
+
+## RecordArrays: Structured Arrays with a Twist
+
+NumPy also provides `np.rearray` which allows you to access fields as attributes rather than as dictionary keys.
