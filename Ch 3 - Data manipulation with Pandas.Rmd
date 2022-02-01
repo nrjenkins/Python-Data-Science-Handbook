@@ -3,5 +3,385 @@ title: "Chapter 3: Data Manipulation with Pandas"
 output: html_notebook
 ---
 
+Pandas is built on top of NumPy and provides DataFrames which are essentially multidimensional arrays with attached tow and columns labels, and often with heterogeneous types and/or missing data.
 
+## Installing and Using Pandas
 
+```{python}
+import pandas as pd
+pandas.__version__
+```
+
+# Introducing Pandas Objects
+
+To get started, we'll explore the `Series`, `DataFrame`, and `Index`.
+
+```{python}
+import numpy as np
+import pandas as pd
+```
+
+## The Pandas Series Object
+
+A Pandas Series is a one-dimensional array of indexed data created as follows:
+
+```{python}
+data = pd.Series([0.25, 0.5, 0.75, 1.0])
+data
+```
+
+Here we get indices and values. Like with NumPy, data can be accessed by the associated index via the square-bracket notation:
+
+```{python}
+data[1]
+
+data[1:3]
+```
+
+### `Series` as generalized NumPy array
+
+Pandas series have explicitly defined indices. This means that the index doesn't need to be an integer. For example:
+
+```{python}
+data = pd.Series(
+  [0.25, 0.5, 0.75, 1.0],
+  index = ["a", "b", "c", "d"]
+)
+
+data
+```
+
+### Series as specialized dictionary
+
+A Pandas `series` is like a specialization of a Python dictionary. A dictionary is a structure that maps arbitrary keys to a set of types values.
+
+```{python}
+population_dict = {'California': 38332521,
+                   'Texas': 26448193,
+                   'New York': 19651127,
+                   'Florida': 19552860,
+                   'Illinois': 12882135}
+population = pd.Series(population_dict)
+population
+
+population["California"]
+```
+
+### Constructing series objects
+
+In general, constructing a series follows this format:
+
+```{python eval = FALSE}
+pd.Series(data, index = index)
+```
+
+## The Pandas DataFrame Object
+
+### DataFrame as a generalized NumPy array
+
+Let's construct a new `Series`:
+
+```{python}
+area_dict = {'California': 423967, 'Texas': 695662, 'New York': 141297,
+             'Florida': 170312, 'Illinois': 149995}
+area = pd.Series(area_dict)
+area
+```
+
+We can use the population data from before to construct a single two-dimensional object containing this information:
+
+```{python}
+states = pd.DataFrame({'population': population,
+                       'area': area})
+states
+```
+
+We can access the attributes of an index like this:
+
+```{python}
+states.index
+```
+
+Or the columns like this:
+
+```{python}
+states.columns
+```
+
+### DataFrame as a specialized dictionary
+
+```{python}
+states["area"]
+```
+
+### Constructing DataFrame objects
+
+#### From a single Series object
+
+```{python}
+pd.DataFrame(population, columns = ["population"])
+```
+
+#### From a list of dicts
+
+```{python}
+data = [{'a': i, 'b': 2 * i}
+        for i in range(3)]
+data
+
+pd.DataFrame(data)
+```
+
+Even if some of the keys in the dictionary are missing, Pandas will fill them in with `NaN`:
+
+```{python}
+pd.DataFrame([{'a': 1, 'b': 2}, {'b': 3, 'c': 4}])
+```
+
+#### From a dictionary of Series objects
+
+```{python}
+pd.DataFrame({'population': population,
+              'area': area})
+```
+
+#### From a two-dimensional NumPy array
+
+```{python}
+pd.DataFrame(np.random.rand(3, 2),
+             columns=['foo', 'bar'],
+             index=['a', 'b', 'c'])
+```
+
+#### From a NumPy structured array
+
+```{python}
+A = np.zeros(3, dtype=[('A', 'i8'), ('B', 'f8')])
+A
+
+pd.DataFrame(A)
+```
+
+## The Pandas Index Object
+
+```{python}
+ind = pd.Index([2, 3, 5, 7, 11])
+ind
+```
+
+### Index as immutable array
+
+```{python}
+ind[1]
+
+ind[::2]
+```
+
+Indices are immutable.
+
+### Index as ordered set
+
+The `Index` object follows many of the conventions used by Python's built-in `set` data structure, so that unions, intersections, differences, and other combinations can be computed in a familiar way.
+
+```{python}
+indA = pd.Index([1, 3, 5, 7, 9])
+indB = pd.Index([2, 3, 5, 7, 11])
+
+# intersection
+indA & indB
+
+# union
+indA | indB
+
+# symmetric difference
+indA ^ indB
+```
+
+# Data Indexing and Selection
+
+## Data Selection in Series
+
+### Series as dictionary
+
+```{python}
+import pandas as pd
+data = pd.Series([0.25, 0.5, 0.75, 1.0],
+                 index=['a', 'b', 'c', 'd'])
+data
+
+data["b"]
+```
+
+We can also use dictionary-like Python expressions and methods to examine the keys/indices and values:
+
+```{python}
+"a" in data
+
+data.keys()
+
+list(data.items())
+```
+
+`Series` objects can also be modified with a dictionary-like syntax:
+
+```{python}
+data["e"] = 1.25
+data
+```
+
+### Series as one-dimensional array
+
+A `series` builds on the dictionary-like interface and provides array-style item selection via the same basic mechanisms as NumPy arrays.
+
+```{python}
+data
+
+# slicing by explicit index
+data["a":"c"]
+
+# slicing by implicit integer index
+data[0:2]
+
+# masking
+data[(data > 0.3) & (data < 0.8)]
+
+# fancy indexing
+data[["a", "e"]]
+```
+
+### Indexers: `loc`, `iloc`, and `ix`
+
+If your `series` has an explicit integer index, an indexing operation such as `data[1]` will use the explicit indices, while a slicing operation like `data[1:3]` will use the Python-style index.
+
+```{python}
+data = pd.Series(['a', 'b', 'c'], index=[1, 3, 5])
+data
+
+# explicit index when indexing
+data[1]
+
+# implicit index when slicing
+data[1:3]
+```
+
+To avoid confusion, Pandas provides some special indexer attributes. First, the `loc` attribute allows indexing and slicing that always references the explicit index:
+
+```{python}
+data.loc[1]
+
+data.loc[1:3]
+```
+
+The `iloc` attribute allows indexing and slicing that always references the implicit Python-style index:
+
+```{python}
+data.iloc[1]
+
+data.iloc[1:3]
+```
+
+## Data Selection in DataFrame
+
+### DataFrame as a dictionary
+
+```{python}
+area = pd.Series({'California': 423967, 'Texas': 695662,
+                  'New York': 141297, 'Florida': 170312,
+                  'Illinois': 149995})
+pop = pd.Series({'California': 38332521, 'Texas': 26448193,
+                 'New York': 19651127, 'Florida': 19552860,
+                 'Illinois': 12882135})
+data = pd.DataFrame({'area':area, 'pop':pop})
+data
+```
+
+The `series` that make up the columns of the `DataFrame` can be accessed via dictionary-style indexing of the column name:
+
+```{python}
+data["area"]
+```
+
+We can also use attribute-style access with column names that are strings:
+
+```{python}
+data.area
+
+data.area is data["area"]
+```
+
+Dictionary-style syntax can also be used to modify the object, in this case adding a new column:
+
+```{python}
+data['density'] = data['pop'] / data['area']
+data
+```
+
+### DataFrame as two-dimensional array
+
+```{python}
+data.values
+```
+
+We can swap rows and columns like this:
+
+```{python}
+data.T
+```
+
+Passing a single index to an array accesses a row:
+
+```{python}
+data.values[0]
+```
+
+and passing a single "index" to a DataFrame accesses a column:
+
+```{python}
+data["area"]
+```
+
+So, for array-style indexing, we need another convention. Using the `iloc` indexer, we can index the underlying array as if it is a simple NumPy array, but the DataFrame index and column labels are maintained in the result:
+
+```{python}
+data.iloc[:3, :2]
+```
+
+We can index the underlying data in an array-like style but using the explicit index and column names:
+
+```{python}
+data.loc[:'Illinois', :'pop']
+```
+
+The `ix` indexer allows a hybrid of these two approaches:
+
+```{python}
+data.ix[:3, :"pop"]
+```
+
+With the `loc` indexer, we can combine masking and fancy indexing as in the following:
+
+```{python}
+data.loc[data.density > 100, ["pop", "density"]]
+```
+
+### Additional indexing conventions
+
+While indexing refers to columns, slicing refers to rows:
+
+```{python}
+data["Florida":"Illinois"]
+```
+
+Such slices can also refer to tows by number rather than index:
+
+```{python}
+data[1:3]
+```
+
+Direct masking operations are also interpreted row-wise rather than column-wise:
+
+```{python}
+data[data.density > 100]
+```
+
+# Operating on Data in Pandas

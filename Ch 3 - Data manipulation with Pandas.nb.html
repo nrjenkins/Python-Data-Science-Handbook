@@ -215,9 +215,743 @@ pre code {
 
 
 <!-- rnb-text-begin -->
+<p>Pandas is built on top of NumPy and provides DataFrames which are essentially multidimensional arrays with attached tow and columns labels, and often with heterogeneous types and/or missing data.</p>
+<div id="installing-and-using-pandas" class="section level2">
+<h2>Installing and Using Pandas</h2>
 <!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgcHl0aG9uXG5wYW5kYXMuX192ZXJzaW9uX19cblxuYGBgIn0= -->
+<pre class="python"><code>pandas.__version__
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiJzEuMy41J1xuIn0= -->
+<pre><code>&#39;1.3.5&#39;</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="introducing-pandas-objects" class="section level1">
+<h1>Introducing Pandas Objects</h1>
+<p>To get started, we’ll explore the <code>Series</code>, <code>DataFrame</code>, and <code>Index</code>.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgcHl0aG9uXG5pbXBvcnQgbnVtcHkgYXMgbnBcbmltcG9ydCBwYW5kYXMgYXMgcGRcbmBgYCJ9 -->
+<pre class="python"><code>import numpy as np
+import pandas as pd</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<div id="the-pandas-series-object" class="section level2">
+<h2>The Pandas Series Object</h2>
+<p>A Pandas Series is a one-dimensional array of indexed data created as follows:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgcHl0aG9uXG5kYXRhXG5cbmBgYCJ9 -->
+<pre class="python"><code>data
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiMCAgICAwLjI1XG4xICAgIDAuNTBcbjIgICAgMC43NVxuMyAgICAxLjAwXG5kdHlwZTogZmxvYXQ2NFxuIn0= -->
+<pre><code>0    0.25
+1    0.50
+2    0.75
+3    1.00
+dtype: float64</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Here we get indices and values. Like with NumPy, data can be accessed by the associated index via the square-bracket notation:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgcHl0aG9uXG5kYXRhWzE6M11cblxuYGBgIn0= -->
+<pre class="python"><code>data[1:3]
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiMSAgICAwLjUwXG4yICAgIDAuNzVcbmR0eXBlOiBmbG9hdDY0XG4ifQ== -->
+<pre><code>1    0.50
+2    0.75
+dtype: float64</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<div id="series-as-generalized-numpy-array" class="section level3">
+<h3><code>Series</code> as generalized NumPy array</h3>
+<p>Pandas series have explicitly defined indices. This means that the index doesn’t need to be an integer. For example:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgcHl0aG9uXG5kYXRhXG5cbmBgYCJ9 -->
+<pre class="python"><code>data
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiYSAgICAwLjI1XG5iICAgIDAuNTBcbmMgICAgMC43NVxuZCAgICAxLjAwXG5kdHlwZTogZmxvYXQ2NFxuIn0= -->
+<pre><code>a    0.25
+b    0.50
+c    0.75
+d    1.00
+dtype: float64</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="series-as-specialized-dictionary" class="section level3">
+<h3>Series as specialized dictionary</h3>
+<p>A Pandas <code>series</code> is like a specialization of a Python dictionary. A dictionary is a structure that maps arbitrary keys to a set of types values.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgcHl0aG9uXG5wb3B1bGF0aW9uW1wiQ2FsaWZvcm5pYVwiXVxuXG5gYGAifQ== -->
+<pre class="python"><code>population[&quot;California&quot;]
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiMzgzMzI1MjFcbiJ9 -->
+<pre><code>38332521</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="constructing-series-objects" class="section level3">
+<h3>Constructing series objects</h3>
+<p>In general, constructing a series follows this format:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoicGQuU2VyaWVzKGRhdGEsIGluZGV4ID0gaW5kZXgpIn0= -->
+<pre class="r"><code>pd.Series(data, index = index)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+</div>
+<div id="the-pandas-dataframe-object" class="section level2">
+<h2>The Pandas DataFrame Object</h2>
+<div id="dataframe-as-a-generalized-numpy-array" class="section level3">
+<h3>DataFrame as a generalized NumPy array</h3>
+<p>Let’s construct a new <code>Series</code>:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgcHl0aG9uXG5hcmVhX2RpY3QgPSB7J0NhbGlmb3JuaWEnOiA0MjM5NjcsICdUZXhhcyc6IDY5NTY2MiwgJ05ldyBZb3JrJzogMTQxMjk3LFxuICAgICAgICAgICAgICdGbG9yaWRhJzogMTcwMzEyLCAnSWxsaW5vaXMnOiAxNDk5OTV9XG5hcmVhID0gcGQuU2VyaWVzKGFyZWFfZGljdClcbmFyZWFcbmBgYCJ9 -->
+<pre class="python"><code>area_dict = {&#39;California&#39;: 423967, &#39;Texas&#39;: 695662, &#39;New York&#39;: 141297,
+             &#39;Florida&#39;: 170312, &#39;Illinois&#39;: 149995}
+area = pd.Series(area_dict)
+area</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiQ2FsaWZvcm5pYSAgICA0MjM5NjdcblRleGFzICAgICAgICAgNjk1NjYyXG5OZXcgWW9yayAgICAgIDE0MTI5N1xuRmxvcmlkYSAgICAgICAxNzAzMTJcbklsbGlub2lzICAgICAgMTQ5OTk1XG5kdHlwZTogaW50NjRcbiJ9 -->
+<pre><code>California    423967
+Texas         695662
+New York      141297
+Florida       170312
+Illinois      149995
+dtype: int64</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>We can use the population data from before to construct a single two-dimensional object containing this information:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgcHl0aG9uXG5zdGF0ZXMgPSBwZC5EYXRhRnJhbWUoeydwb3B1bGF0aW9uJzogcG9wdWxhdGlvbixcbiAgICAgICAgICAgICAgICAgICAgICAgJ2FyZWEnOiBhcmVhfSlcbnN0YXRlc1xuYGBgIn0= -->
+<pre class="python"><code>states = pd.DataFrame({&#39;population&#39;: population,
+                       &#39;area&#39;: area})
+states</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiICAgICAgICAgICAgcG9wdWxhdGlvbiAgICBhcmVhXG5DYWxpZm9ybmlhICAgIDM4MzMyNTIxICA0MjM5NjdcblRleGFzICAgICAgICAgMjY0NDgxOTMgIDY5NTY2MlxuTmV3IFlvcmsgICAgICAxOTY1MTEyNyAgMTQxMjk3XG5GbG9yaWRhICAgICAgIDE5NTUyODYwICAxNzAzMTJcbklsbGlub2lzICAgICAgMTI4ODIxMzUgIDE0OTk5NVxuIn0= -->
+<pre><code>            population    area
+California    38332521  423967
+Texas         26448193  695662
+New York      19651127  141297
+Florida       19552860  170312
+Illinois      12882135  149995</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>We can access the attributes of an index like this:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgcHl0aG9uXG5zdGF0ZXMuaW5kZXhcblxuYGBgIn0= -->
+<pre class="python"><code>states.index
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiSW5kZXgoWydDYWxpZm9ybmlhJywgJ1RleGFzJywgJ05ldyBZb3JrJywgJ0Zsb3JpZGEnLCAnSWxsaW5vaXMnXSwgZHR5cGU9J29iamVjdCcpXG4ifQ== -->
+<pre><code>Index([&#39;California&#39;, &#39;Texas&#39;, &#39;New York&#39;, &#39;Florida&#39;, &#39;Illinois&#39;], dtype=&#39;object&#39;)</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Or the columns like this:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgcHl0aG9uXG5zdGF0ZXMuY29sdW1uc1xuXG5gYGAifQ== -->
+<pre class="python"><code>states.columns
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiSW5kZXgoWydwb3B1bGF0aW9uJywgJ2FyZWEnXSwgZHR5cGU9J29iamVjdCcpXG4ifQ== -->
+<pre><code>Index([&#39;population&#39;, &#39;area&#39;], dtype=&#39;object&#39;)</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="dataframe-as-a-specialized-dictionary" class="section level3">
+<h3>DataFrame as a specialized dictionary</h3>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgcHl0aG9uXG5zdGF0ZXNbXCJhcmVhXCJdXG5cbmBgYCJ9 -->
+<pre class="python"><code>states[&quot;area&quot;]
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiQ2FsaWZvcm5pYSAgICA0MjM5NjdcblRleGFzICAgICAgICAgNjk1NjYyXG5OZXcgWW9yayAgICAgIDE0MTI5N1xuRmxvcmlkYSAgICAgICAxNzAzMTJcbklsbGlub2lzICAgICAgMTQ5OTk1XG5OYW1lOiBhcmVhLCBkdHlwZTogaW50NjRcbiJ9 -->
+<pre><code>California    423967
+Texas         695662
+New York      141297
+Florida       170312
+Illinois      149995
+Name: area, dtype: int64</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="constructing-dataframe-objects" class="section level3">
+<h3>Constructing DataFrame objects</h3>
+<div id="from-a-single-series-object" class="section level4">
+<h4>From a single Series object</h4>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgcHl0aG9uXG5wZC5EYXRhRnJhbWUocG9wdWxhdGlvbiwgY29sdW1ucyA9IFtcInBvcHVsYXRpb25cIl0pXG5cbmBgYCJ9 -->
+<pre class="python"><code>pd.DataFrame(population, columns = [&quot;population&quot;])
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiICAgICAgICAgICAgcG9wdWxhdGlvblxuQ2FsaWZvcm5pYSAgICAzODMzMjUyMVxuVGV4YXMgICAgICAgICAyNjQ0ODE5M1xuTmV3IFlvcmsgICAgICAxOTY1MTEyN1xuRmxvcmlkYSAgICAgICAxOTU1Mjg2MFxuSWxsaW5vaXMgICAgICAxMjg4MjEzNVxuIn0= -->
+<pre><code>            population
+California    38332521
+Texas         26448193
+New York      19651127
+Florida       19552860
+Illinois      12882135</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="from-a-list-of-dicts" class="section level4">
+<h4>From a list of dicts</h4>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgcHl0aG9uXG5wZC5EYXRhRnJhbWUoZGF0YSlcblxuYGBgIn0= -->
+<pre class="python"><code>pd.DataFrame(data)
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiICAgYSAgYlxuMCAgMCAgMFxuMSAgMSAgMlxuMiAgMiAgNFxuIn0= -->
+<pre><code>   a  b
+0  0  0
+1  1  2
+2  2  4</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Even if some of the keys in the dictionary are missing, Pandas will fill them in with <code>NaN</code>:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgcHl0aG9uXG5wZC5EYXRhRnJhbWUoW3snYSc6IDEsICdiJzogMn0sIHsnYic6IDMsICdjJzogNH1dKVxuXG5gYGAifQ== -->
+<pre class="python"><code>pd.DataFrame([{&#39;a&#39;: 1, &#39;b&#39;: 2}, {&#39;b&#39;: 3, &#39;c&#39;: 4}])
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiICAgICBhICBiICAgIGNcbjAgIDEuMCAgMiAgTmFOXG4xICBOYU4gIDMgIDQuMFxuIn0= -->
+<pre><code>     a  b    c
+0  1.0  2  NaN
+1  NaN  3  4.0</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="from-a-dictionary-of-series-objects" class="section level4">
+<h4>From a dictionary of Series objects</h4>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgcHl0aG9uXG5wZC5EYXRhRnJhbWUoeydwb3B1bGF0aW9uJzogcG9wdWxhdGlvbixcbiAgICAgICAgICAgICAgJ2FyZWEnOiBhcmVhfSlcbmBgYCJ9 -->
+<pre class="python"><code>pd.DataFrame({&#39;population&#39;: population,
+              &#39;area&#39;: area})</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiICAgICAgICAgICAgcG9wdWxhdGlvbiAgICBhcmVhXG5DYWxpZm9ybmlhICAgIDM4MzMyNTIxICA0MjM5NjdcblRleGFzICAgICAgICAgMjY0NDgxOTMgIDY5NTY2MlxuTmV3IFlvcmsgICAgICAxOTY1MTEyNyAgMTQxMjk3XG5GbG9yaWRhICAgICAgIDE5NTUyODYwICAxNzAzMTJcbklsbGlub2lzICAgICAgMTI4ODIxMzUgIDE0OTk5NVxuIn0= -->
+<pre><code>            population    area
+California    38332521  423967
+Texas         26448193  695662
+New York      19651127  141297
+Florida       19552860  170312
+Illinois      12882135  149995</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="from-a-two-dimensional-numpy-array" class="section level4">
+<h4>From a two-dimensional NumPy array</h4>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgcHl0aG9uXG5wZC5EYXRhRnJhbWUobnAucmFuZG9tLnJhbmQoMywgMiksXG4gICAgICAgICAgICAgY29sdW1ucz1bJ2ZvbycsICdiYXInXSxcbiAgICAgICAgICAgICBpbmRleD1bJ2EnLCAnYicsICdjJ10pXG5gYGAifQ== -->
+<pre class="python"><code>pd.DataFrame(np.random.rand(3, 2),
+             columns=[&#39;foo&#39;, &#39;bar&#39;],
+             index=[&#39;a&#39;, &#39;b&#39;, &#39;c&#39;])</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiICAgICAgICBmb28gICAgICAgYmFyXG5hICAwLjI0NDYzNSAgMC4xMDg4NTNcbmIgIDAuNjczNjI5ICAwLjU2OTU2NVxuYyAgMC4xODk2MTMgIDAuNTI0MzIxXG4ifQ== -->
+<pre><code>        foo       bar
+a  0.244635  0.108853
+b  0.673629  0.569565
+c  0.189613  0.524321</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="from-a-numpy-structured-array" class="section level4">
+<h4>From a NumPy structured array</h4>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgcHl0aG9uXG5BID0gbnAuemVyb3MoMywgZHR5cGU9WygnQScsICdpOCcpLCAoJ0InLCAnZjgnKV0pXG5BXG5gYGAifQ== -->
+<pre class="python"><code>A = np.zeros(3, dtype=[(&#39;A&#39;, &#39;i8&#39;), (&#39;B&#39;, &#39;f8&#39;)])
+A</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiYXJyYXkoWygwLCAwLiksICgwLCAwLiksICgwLCAwLildLCBkdHlwZT1bKCdBJywgJzxpOCcpLCAoJ0InLCAnPGY4JyldKVxuIn0= -->
+<pre><code>array([(0, 0.), (0, 0.), (0, 0.)], dtype=[(&#39;A&#39;, &#39;&lt;i8&#39;), (&#39;B&#39;, &#39;&lt;f8&#39;)])</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgcHl0aG9uXG5wZC5EYXRhRnJhbWUoQSlcbmBgYCJ9 -->
+<pre class="python"><code>pd.DataFrame(A)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiICAgQSAgICBCXG4wICAwICAwLjBcbjEgIDAgIDAuMFxuMiAgMCAgMC4wXG4ifQ== -->
+<pre><code>   A    B
+0  0  0.0
+1  0  0.0
+2  0  0.0</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+</div>
+</div>
+<div id="the-pandas-index-object" class="section level2">
+<h2>The Pandas Index Object</h2>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgcHl0aG9uXG5pbmRcblxuYGBgIn0= -->
+<pre class="python"><code>ind
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiSW50NjRJbmRleChbMiwgMywgNSwgNywgMTFdLCBkdHlwZT0naW50NjQnKVxuIn0= -->
+<pre><code>Int64Index([2, 3, 5, 7, 11], dtype=&#39;int64&#39;)</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<div id="index-as-immutable-array" class="section level3">
+<h3>Index as immutable array</h3>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgcHl0aG9uXG5pbmRbOjoyXVxuXG5gYGAifQ== -->
+<pre class="python"><code>ind[::2]
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiSW50NjRJbmRleChbMiwgNSwgMTFdLCBkdHlwZT0naW50NjQnKVxuIn0= -->
+<pre><code>Int64Index([2, 5, 11], dtype=&#39;int64&#39;)</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Indices are immutable.</p>
+</div>
+<div id="index-as-ordered-set" class="section level3">
+<h3>Index as ordered set</h3>
+<p>The <code>Index</code> object follows many of the conventions used by Python’s built-in <code>set</code> data structure, so that unions, intersections, differences, and other combinations can be computed in a familiar way.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgcHl0aG9uXG5pbmRBIF4gaW5kQlxuXG5gYGAifQ== -->
+<pre class="python"><code>indA ^ indB
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiSW50NjRJbmRleChbMSwgMiwgOSwgMTFdLCBkdHlwZT0naW50NjQnKVxuIn0= -->
+<pre><code>Int64Index([1, 2, 9, 11], dtype=&#39;int64&#39;)</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiPHN0cmluZz46MTogRnV0dXJlV2FybmluZzogSW5kZXguX194b3JfXyBvcGVyYXRpbmcgYXMgYSBzZXQgb3BlcmF0aW9uIGlzIGRlcHJlY2F0ZWQsIGluIHRoZSBmdXR1cmUgdGhpcyB3aWxsIGJlIGEgbG9naWNhbCBvcGVyYXRpb24gbWF0Y2hpbmcgU2VyaWVzLl9feG9yX18uICBVc2UgaW5kZXguc3ltbWV0cmljX2RpZmZlcmVuY2Uob3RoZXIpIGluc3RlYWRcbiJ9 -->
+<pre><code>&lt;string&gt;:1: FutureWarning: Index.__xor__ operating as a set operation is deprecated, in the future this will be a logical operation matching Series.__xor__.  Use index.symmetric_difference(other) instead</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+</div>
+</div>
+<div id="data-indexing-and-selection" class="section level1">
+<h1>Data Indexing and Selection</h1>
+<div id="data-selection-in-series" class="section level2">
+<h2>Data Selection in Series</h2>
+<div id="series-as-dictionary" class="section level3">
+<h3>Series as dictionary</h3>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgcHl0aG9uXG5kYXRhW1wiYlwiXVxuXG5gYGAifQ== -->
+<pre class="python"><code>data[&quot;b&quot;]
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiMC41XG4ifQ== -->
+<pre><code>0.5</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>We can also use dictionary-like Python expressions and methods to examine the keys/indices and values:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgcHl0aG9uXG5saXN0KGRhdGEuaXRlbXMoKSlcblxuYGBgIn0= -->
+<pre class="python"><code>list(data.items())
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWygnYScsIDAuMjUpLCAoJ2InLCAwLjUpLCAoJ2MnLCAwLjc1KSwgKCdkJywgMS4wKV1cbiJ9 -->
+<pre><code>[(&#39;a&#39;, 0.25), (&#39;b&#39;, 0.5), (&#39;c&#39;, 0.75), (&#39;d&#39;, 1.0)]</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p><code>Series</code> objects can also be modified with a dictionary-like syntax:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgcHl0aG9uXG5kYXRhXG5cbmBgYCJ9 -->
+<pre class="python"><code>data
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiYSAgICAwLjI1XG5iICAgIDAuNTBcbmMgICAgMC43NVxuZCAgICAxLjAwXG5lICAgIDEuMjVcbmR0eXBlOiBmbG9hdDY0XG4ifQ== -->
+<pre><code>a    0.25
+b    0.50
+c    0.75
+d    1.00
+e    1.25
+dtype: float64</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="series-as-one-dimensional-array" class="section level3">
+<h3>Series as one-dimensional array</h3>
+<p>A <code>series</code> builds on the dictionary-like interface and provides array-style item selection via the same basic mechanisms as NumPy arrays.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgcHl0aG9uXG5kYXRhW1tcImFcIiwgXCJlXCJdXVxuXG5gYGAifQ== -->
+<pre class="python"><code>data[[&quot;a&quot;, &quot;e&quot;]]
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiYSAgICAwLjI1XG5lICAgIDEuMjVcbmR0eXBlOiBmbG9hdDY0XG4ifQ== -->
+<pre><code>a    0.25
+e    1.25
+dtype: float64</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="indexers-loc-iloc-and-ix" class="section level3">
+<h3>Indexers: <code>loc</code>, <code>iloc</code>, and <code>ix</code></h3>
+<p>If your <code>series</code> has an explicit integer index, an indexing operation such as <code>data[1]</code> will use the explicit indices, while a slicing operation like <code>data[1:3]</code> will use the Python-style index.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgcHl0aG9uXG5kYXRhID0gcGQuU2VyaWVzKFsnYScsICdiJywgJ2MnXSwgaW5kZXg9WzEsIDMsIDVdKVxuZGF0YVxuYGBgIn0= -->
+<pre class="python"><code>data = pd.Series([&#39;a&#39;, &#39;b&#39;, &#39;c&#39;], index=[1, 3, 5])
+data</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiMSAgICBhXG4zICAgIGJcbjUgICAgY1xuZHR5cGU6IG9iamVjdFxuIn0= -->
+<pre><code>1    a
+3    b
+5    c
+dtype: object</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgcHl0aG9uXG4jIGV4cGxpY2l0IGluZGV4IHdoZW4gaW5kZXhpbmdcbmRhdGFbMV1cbmBgYCJ9 -->
+<pre class="python"><code># explicit index when indexing
+data[1]</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiJ2EnXG4ifQ== -->
+<pre><code>&#39;a&#39;</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgcHl0aG9uXG4jIGltcGxpY2l0IGluZGV4IHdoZW4gc2xpY2luZ1xuZGF0YVsxOjNdXG5gYGAifQ== -->
+<pre class="python"><code># implicit index when slicing
+data[1:3]</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiMyAgICBiXG41ICAgIGNcbmR0eXBlOiBvYmplY3RcbiJ9 -->
+<pre><code>3    b
+5    c
+dtype: object</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>To avoid confusion, Pandas provides some special indexer attributes. First, the <code>loc</code> attribute allows indexing and slicing that always references the explicit index:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgcHl0aG9uXG5kYXRhLmxvY1sxXVxuYGBgIn0= -->
+<pre class="python"><code>data.loc[1]</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiJ2EnXG4ifQ== -->
+<pre><code>&#39;a&#39;</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgcHl0aG9uXG5kYXRhLmxvY1sxOjNdXG5gYGAifQ== -->
+<pre class="python"><code>data.loc[1:3]</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiMSAgICBhXG4zICAgIGJcbmR0eXBlOiBvYmplY3RcbiJ9 -->
+<pre><code>1    a
+3    b
+dtype: object</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>The <code>iloc</code> attribute allows indexing and slicing that always references the implicit Python-style index:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgcHl0aG9uXG5kYXRhLmlsb2NbMV1cbmBgYCJ9 -->
+<pre class="python"><code>data.iloc[1]</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiJ2InXG4ifQ== -->
+<pre><code>&#39;b&#39;</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgcHl0aG9uXG5kYXRhLmlsb2NbMTozXVxuYGBgIn0= -->
+<pre class="python"><code>data.iloc[1:3]</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiMyAgICBiXG41ICAgIGNcbmR0eXBlOiBvYmplY3RcbiJ9 -->
+<pre><code>3    b
+5    c
+dtype: object</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+</div>
+<div id="data-selection-in-dataframe" class="section level2">
+<h2>Data Selection in DataFrame</h2>
+<div id="dataframe-as-a-dictionary" class="section level3">
+<h3>DataFrame as a dictionary</h3>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgcHl0aG9uXG5hcmVhID0gcGQuU2VyaWVzKHsnQ2FsaWZvcm5pYSc6IDQyMzk2NywgJ1RleGFzJzogNjk1NjYyLFxuICAgICAgICAgICAgICAgICAgJ05ldyBZb3JrJzogMTQxMjk3LCAnRmxvcmlkYSc6IDE3MDMxMixcbiAgICAgICAgICAgICAgICAgICdJbGxpbm9pcyc6IDE0OTk5NX0pXG5wb3AgPSBwZC5TZXJpZXMoeydDYWxpZm9ybmlhJzogMzgzMzI1MjEsICdUZXhhcyc6IDI2NDQ4MTkzLFxuICAgICAgICAgICAgICAgICAnTmV3IFlvcmsnOiAxOTY1MTEyNywgJ0Zsb3JpZGEnOiAxOTU1Mjg2MCxcbiAgICAgICAgICAgICAgICAgJ0lsbGlub2lzJzogMTI4ODIxMzV9KVxuZGF0YSA9IHBkLkRhdGFGcmFtZSh7J2FyZWEnOmFyZWEsICdwb3AnOnBvcH0pXG5kYXRhXG5gYGAifQ== -->
+<pre class="python"><code>area = pd.Series({&#39;California&#39;: 423967, &#39;Texas&#39;: 695662,
+                  &#39;New York&#39;: 141297, &#39;Florida&#39;: 170312,
+                  &#39;Illinois&#39;: 149995})
+pop = pd.Series({&#39;California&#39;: 38332521, &#39;Texas&#39;: 26448193,
+                 &#39;New York&#39;: 19651127, &#39;Florida&#39;: 19552860,
+                 &#39;Illinois&#39;: 12882135})
+data = pd.DataFrame({&#39;area&#39;:area, &#39;pop&#39;:pop})
+data</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiICAgICAgICAgICAgICBhcmVhICAgICAgIHBvcFxuQ2FsaWZvcm5pYSAgNDIzOTY3ICAzODMzMjUyMVxuVGV4YXMgICAgICAgNjk1NjYyICAyNjQ0ODE5M1xuTmV3IFlvcmsgICAgMTQxMjk3ICAxOTY1MTEyN1xuRmxvcmlkYSAgICAgMTcwMzEyICAxOTU1Mjg2MFxuSWxsaW5vaXMgICAgMTQ5OTk1ICAxMjg4MjEzNVxuIn0= -->
+<pre><code>              area       pop
+California  423967  38332521
+Texas       695662  26448193
+New York    141297  19651127
+Florida     170312  19552860
+Illinois    149995  12882135</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-output-begin eyJkYXRhIjoic3lzOjE6IEZ1dHVyZVdhcm5pbmc6IEF1dG9tYXRpYyByZWluZGV4aW5nIG9uIERhdGFGcmFtZSB2cyBTZXJpZXMgY29tcGFyaXNvbnMgaXMgZGVwcmVjYXRlZCBhbmQgd2lsbCByYWlzZSBWYWx1ZUVycm9yIGluIGEgZnV0dXJlIHZlcnNpb24uICBEbyBgbGVmdCwgcmlnaHQgPSBsZWZ0LmFsaWduKHJpZ2h0LCBheGlzPTEsIGNvcHk9RmFsc2UpYCBiZWZvcmUgZS5nLiBgbGVmdCA9PSByaWdodGBcbiJ9 -->
+<pre><code>sys:1: FutureWarning: Automatic reindexing on DataFrame vs Series comparisons is deprecated and will raise ValueError in a future version.  Do `left, right = left.align(right, axis=1, copy=False)` before e.g. `left == right`</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>The <code>series</code> that make up the columns of the <code>DataFrame</code> can be accessed via dictionary-style indexing of the column name:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgcHl0aG9uXG5kYXRhW1wiYXJlYVwiXVxuXG5gYGAifQ== -->
+<pre class="python"><code>data[&quot;area&quot;]
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiQ2FsaWZvcm5pYSAgICA0MjM5NjdcblRleGFzICAgICAgICAgNjk1NjYyXG5OZXcgWW9yayAgICAgIDE0MTI5N1xuRmxvcmlkYSAgICAgICAxNzAzMTJcbklsbGlub2lzICAgICAgMTQ5OTk1XG5OYW1lOiBhcmVhLCBkdHlwZTogaW50NjRcbiJ9 -->
+<pre><code>California    423967
+Texas         695662
+New York      141297
+Florida       170312
+Illinois      149995
+Name: area, dtype: int64</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>We can also use attribute-style access with column names that are strings:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgcHl0aG9uXG5kYXRhLmFyZWEgaXMgZGF0YVtcImFyZWFcIl1cblxuYGBgIn0= -->
+<pre class="python"><code>data.area is data[&quot;area&quot;]
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiVHJ1ZVxuIn0= -->
+<pre><code>True</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Dictionary-style syntax can also be used to modify the object, in this case adding a new column:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgcHl0aG9uXG5kYXRhWydkZW5zaXR5J10gPSBkYXRhWydwb3AnXSAvIGRhdGFbJ2FyZWEnXVxuZGF0YVxuYGBgIn0= -->
+<pre class="python"><code>data[&#39;density&#39;] = data[&#39;pop&#39;] / data[&#39;area&#39;]
+data</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiICAgICAgICAgICAgICBhcmVhICAgICAgIHBvcCAgICAgZGVuc2l0eVxuQ2FsaWZvcm5pYSAgNDIzOTY3ICAzODMzMjUyMSAgIDkwLjQxMzkyNlxuVGV4YXMgICAgICAgNjk1NjYyICAyNjQ0ODE5MyAgIDM4LjAxODc0MFxuTmV3IFlvcmsgICAgMTQxMjk3ICAxOTY1MTEyNyAgMTM5LjA3Njc0NlxuRmxvcmlkYSAgICAgMTcwMzEyICAxOTU1Mjg2MCAgMTE0LjgwNjEyMVxuSWxsaW5vaXMgICAgMTQ5OTk1ICAxMjg4MjEzNSAgIDg1Ljg4Mzc2M1xuIn0= -->
+<pre><code>              area       pop     density
+California  423967  38332521   90.413926
+Texas       695662  26448193   38.018740
+New York    141297  19651127  139.076746
+Florida     170312  19552860  114.806121
+Illinois    149995  12882135   85.883763</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="dataframe-as-two-dimensional-array" class="section level3">
+<h3>DataFrame as two-dimensional array</h3>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgcHl0aG9uXG5kYXRhLnZhbHVlc1xuXG5gYGAifQ== -->
+<pre class="python"><code>data.values
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiYXJyYXkoW1s0LjIzOTY3MDAwZSswNSwgMy44MzMyNTIxMGUrMDcsIDkuMDQxMzkyNjFlKzAxXSxcbiAgICAgICBbNi45NTY2MjAwMGUrMDUsIDIuNjQ0ODE5MzBlKzA3LCAzLjgwMTg3NDA0ZSswMV0sXG4gICAgICAgWzEuNDEyOTcwMDBlKzA1LCAxLjk2NTExMjcwZSswNywgMS4zOTA3Njc0NmUrMDJdLFxuICAgICAgIFsxLjcwMzEyMDAwZSswNSwgMS45NTUyODYwMGUrMDcsIDEuMTQ4MDYxMjFlKzAyXSxcbiAgICAgICBbMS40OTk5NTAwMGUrMDUsIDEuMjg4MjEzNTBlKzA3LCA4LjU4ODM3NjI4ZSswMV1dKVxuIn0= -->
+<pre><code>array([[4.23967000e+05, 3.83325210e+07, 9.04139261e+01],
+       [6.95662000e+05, 2.64481930e+07, 3.80187404e+01],
+       [1.41297000e+05, 1.96511270e+07, 1.39076746e+02],
+       [1.70312000e+05, 1.95528600e+07, 1.14806121e+02],
+       [1.49995000e+05, 1.28821350e+07, 8.58837628e+01]])</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>We can swap rows and columns like this:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgcHl0aG9uXG5kYXRhLlRcblxuYGBgIn0= -->
+<pre class="python"><code>data.T
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiICAgICAgICAgICBDYWxpZm9ybmlhICAgICAgICAgVGV4YXMgICAgICBOZXcgWW9yayAgICAgICBGbG9yaWRhICAgICAgSWxsaW5vaXNcbmFyZWEgICAgIDQuMjM5NjcwZSswNSAgNi45NTY2MjBlKzA1ICAxLjQxMjk3MGUrMDUgIDEuNzAzMTIwZSswNSAgMS40OTk5NTBlKzA1XG5wb3AgICAgICAzLjgzMzI1MmUrMDcgIDIuNjQ0ODE5ZSswNyAgMS45NjUxMTNlKzA3ICAxLjk1NTI4NmUrMDcgIDEuMjg4MjE0ZSswN1xuZGVuc2l0eSAgOS4wNDEzOTNlKzAxICAzLjgwMTg3NGUrMDEgIDEuMzkwNzY3ZSswMiAgMS4xNDgwNjFlKzAyICA4LjU4ODM3NmUrMDFcbiJ9 -->
+<pre><code>           California         Texas      New York       Florida      Illinois
+area     4.239670e+05  6.956620e+05  1.412970e+05  1.703120e+05  1.499950e+05
+pop      3.833252e+07  2.644819e+07  1.965113e+07  1.955286e+07  1.288214e+07
+density  9.041393e+01  3.801874e+01  1.390767e+02  1.148061e+02  8.588376e+01</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Passing a single index to an array accesses a row:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgcHl0aG9uXG5kYXRhLnZhbHVlc1swXVxuXG5gYGAifQ== -->
+<pre class="python"><code>data.values[0]
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiYXJyYXkoWzQuMjM5NjcwMDBlKzA1LCAzLjgzMzI1MjEwZSswNywgOS4wNDEzOTI2MWUrMDFdKVxuIn0= -->
+<pre><code>array([4.23967000e+05, 3.83325210e+07, 9.04139261e+01])</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>and passing a single “index” to a DataFrame accesses a column:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgcHl0aG9uXG5kYXRhW1wiYXJlYVwiXVxuXG5gYGAifQ== -->
+<pre class="python"><code>data[&quot;area&quot;]
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiQ2FsaWZvcm5pYSAgICA0MjM5NjdcblRleGFzICAgICAgICAgNjk1NjYyXG5OZXcgWW9yayAgICAgIDE0MTI5N1xuRmxvcmlkYSAgICAgICAxNzAzMTJcbklsbGlub2lzICAgICAgMTQ5OTk1XG5OYW1lOiBhcmVhLCBkdHlwZTogaW50NjRcbiJ9 -->
+<pre><code>California    423967
+Texas         695662
+New York      141297
+Florida       170312
+Illinois      149995
+Name: area, dtype: int64</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>So, for array-style indexing, we need another convention. Using the <code>iloc</code> indexer, we can index the underlying array as if it is a simple NumPy array, but the DataFrame index and column labels are maintained in the result:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgcHl0aG9uXG5kYXRhLmlsb2NbOjMsIDoyXVxuXG5gYGAifQ== -->
+<pre class="python"><code>data.iloc[:3, :2]
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiICAgICAgICAgICAgICBhcmVhICAgICAgIHBvcFxuQ2FsaWZvcm5pYSAgNDIzOTY3ICAzODMzMjUyMVxuVGV4YXMgICAgICAgNjk1NjYyICAyNjQ0ODE5M1xuTmV3IFlvcmsgICAgMTQxMjk3ICAxOTY1MTEyN1xuIn0= -->
+<pre><code>              area       pop
+California  423967  38332521
+Texas       695662  26448193
+New York    141297  19651127</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>We can index the underlying data in an array-like style but using the explicit index and column names:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgcHl0aG9uXG5kYXRhLmxvY1s6J0lsbGlub2lzJywgOidwb3AnXVxuXG5gYGAifQ== -->
+<pre class="python"><code>data.loc[:&#39;Illinois&#39;, :&#39;pop&#39;]
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiICAgICAgICAgICAgICBhcmVhICAgICAgIHBvcFxuQ2FsaWZvcm5pYSAgNDIzOTY3ICAzODMzMjUyMVxuVGV4YXMgICAgICAgNjk1NjYyICAyNjQ0ODE5M1xuTmV3IFlvcmsgICAgMTQxMjk3ICAxOTY1MTEyN1xuRmxvcmlkYSAgICAgMTcwMzEyICAxOTU1Mjg2MFxuSWxsaW5vaXMgICAgMTQ5OTk1ICAxMjg4MjEzNVxuIn0= -->
+<pre><code>              area       pop
+California  423967  38332521
+Texas       695662  26448193
+New York    141297  19651127
+Florida     170312  19552860
+Illinois    149995  12882135</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>The <code>ix</code> indexer allows a hybrid of these two approaches:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgcHl0aG9uXG5kYXRhLml4WzozLCA6XCJwb3BcIl1cblxuYGBgIn0= -->
+<pre class="python"><code>data.ix[:3, :&quot;pop&quot;]
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiQXR0cmlidXRlRXJyb3I6ICdEYXRhRnJhbWUnIG9iamVjdCBoYXMgbm8gYXR0cmlidXRlICdpeCdcbiJ9 -->
+<pre><code>AttributeError: &#39;DataFrame&#39; object has no attribute &#39;ix&#39;</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>With the <code>loc</code> indexer, we can combine masking and fancy indexing as in the following:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgcHl0aG9uXG5kYXRhLmxvY1tkYXRhLmRlbnNpdHkgPiAxMDAsIFtcInBvcFwiLCBcImRlbnNpdHlcIl1dXG5cbmBgYCJ9 -->
+<pre class="python"><code>data.loc[data.density &gt; 100, [&quot;pop&quot;, &quot;density&quot;]]
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiICAgICAgICAgICAgICAgcG9wICAgICBkZW5zaXR5XG5OZXcgWW9yayAgMTk2NTExMjcgIDEzOS4wNzY3NDZcbkZsb3JpZGEgICAxOTU1Mjg2MCAgMTE0LjgwNjEyMVxuIn0= -->
+<pre><code>               pop     density
+New York  19651127  139.076746
+Florida   19552860  114.806121</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="additional-indexing-conventions" class="section level3">
+<h3>Additional indexing conventions</h3>
+<p>While indexing refers to columns, slicing refers to rows:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgcHl0aG9uXG5kYXRhW1wiRmxvcmlkYVwiOlwiSWxsaW5vaXNcIl1cblxuYGBgIn0= -->
+<pre class="python"><code>data[&quot;Florida&quot;:&quot;Illinois&quot;]
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiICAgICAgICAgICAgYXJlYSAgICAgICBwb3AgICAgIGRlbnNpdHlcbkZsb3JpZGEgICAxNzAzMTIgIDE5NTUyODYwICAxMTQuODA2MTIxXG5JbGxpbm9pcyAgMTQ5OTk1ICAxMjg4MjEzNSAgIDg1Ljg4Mzc2M1xuIn0= -->
+<pre><code>            area       pop     density
+Florida   170312  19552860  114.806121
+Illinois  149995  12882135   85.883763</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Such slices can also refer to tows by number rather than index:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgcHl0aG9uXG5kYXRhWzE6M11cblxuYGBgIn0= -->
+<pre class="python"><code>data[1:3]
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiICAgICAgICAgICAgYXJlYSAgICAgICBwb3AgICAgIGRlbnNpdHlcblRleGFzICAgICA2OTU2NjIgIDI2NDQ4MTkzICAgMzguMDE4NzQwXG5OZXcgWW9yayAgMTQxMjk3ICAxOTY1MTEyNyAgMTM5LjA3Njc0NlxuIn0= -->
+<pre><code>            area       pop     density
+Texas     695662  26448193   38.018740
+New York  141297  19651127  139.076746</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Direct masking operations are also interpreted row-wise rather than column-wise:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgcHl0aG9uXG5kYXRhW2RhdGEuZGVuc2l0eSA+IDEwMF1cblxuYGBgIn0= -->
+<pre class="python"><code>data[data.density &gt; 100]
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiICAgICAgICAgICAgYXJlYSAgICAgICBwb3AgICAgIGRlbnNpdHlcbk5ldyBZb3JrICAxNDEyOTcgIDE5NjUxMTI3ICAxMzkuMDc2NzQ2XG5GbG9yaWRhICAgMTcwMzEyICAxOTU1Mjg2MCAgMTE0LjgwNjEyMVxuIn0= -->
+<pre><code>            area       pop     density
+New York  141297  19651127  139.076746
+Florida   170312  19552860  114.806121</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+</div>
+</div>
+<div id="operating-on-data-in-pandas" class="section level1">
+<h1>Operating on Data in Pandas</h1>
+<!-- rnb-text-end -->
+</div>
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiQ2hhcHRlciAzOiBEYXRhIE1hbmlwdWxhdGlvbiB3aXRoIFBhbmRhcyIKb3V0cHV0OiBodG1sX25vdGVib29rCi0tLQoKCgo=</div>
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiQ2hhcHRlciAzOiBEYXRhIE1hbmlwdWxhdGlvbiB3aXRoIFBhbmRhcyIKb3V0cHV0OiBodG1sX25vdGVib29rCi0tLQoKUGFuZGFzIGlzIGJ1aWx0IG9uIHRvcCBvZiBOdW1QeSBhbmQgcHJvdmlkZXMgRGF0YUZyYW1lcyB3aGljaCBhcmUgZXNzZW50aWFsbHkgbXVsdGlkaW1lbnNpb25hbCBhcnJheXMgd2l0aCBhdHRhY2hlZCB0b3cgYW5kIGNvbHVtbnMgbGFiZWxzLCBhbmQgb2Z0ZW4gd2l0aCBoZXRlcm9nZW5lb3VzIHR5cGVzIGFuZC9vciBtaXNzaW5nIGRhdGEuCgojIyBJbnN0YWxsaW5nIGFuZCBVc2luZyBQYW5kYXMKCmBgYHtweXRob259CmltcG9ydCBwYW5kYXMgYXMgcGQKcGFuZGFzLl9fdmVyc2lvbl9fCmBgYAoKIyBJbnRyb2R1Y2luZyBQYW5kYXMgT2JqZWN0cwoKVG8gZ2V0IHN0YXJ0ZWQsIHdlJ2xsIGV4cGxvcmUgdGhlIGBTZXJpZXNgLCBgRGF0YUZyYW1lYCwgYW5kIGBJbmRleGAuCgpgYGB7cHl0aG9ufQppbXBvcnQgbnVtcHkgYXMgbnAKaW1wb3J0IHBhbmRhcyBhcyBwZApgYGAKCiMjIFRoZSBQYW5kYXMgU2VyaWVzIE9iamVjdAoKQSBQYW5kYXMgU2VyaWVzIGlzIGEgb25lLWRpbWVuc2lvbmFsIGFycmF5IG9mIGluZGV4ZWQgZGF0YSBjcmVhdGVkIGFzIGZvbGxvd3M6CgpgYGB7cHl0aG9ufQpkYXRhID0gcGQuU2VyaWVzKFswLjI1LCAwLjUsIDAuNzUsIDEuMF0pCmRhdGEKYGBgCgpIZXJlIHdlIGdldCBpbmRpY2VzIGFuZCB2YWx1ZXMuIExpa2Ugd2l0aCBOdW1QeSwgZGF0YSBjYW4gYmUgYWNjZXNzZWQgYnkgdGhlIGFzc29jaWF0ZWQgaW5kZXggdmlhIHRoZSBzcXVhcmUtYnJhY2tldCBub3RhdGlvbjoKCmBgYHtweXRob259CmRhdGFbMV0KCmRhdGFbMTozXQpgYGAKCiMjIyBgU2VyaWVzYCBhcyBnZW5lcmFsaXplZCBOdW1QeSBhcnJheQoKUGFuZGFzIHNlcmllcyBoYXZlIGV4cGxpY2l0bHkgZGVmaW5lZCBpbmRpY2VzLiBUaGlzIG1lYW5zIHRoYXQgdGhlIGluZGV4IGRvZXNuJ3QgbmVlZCB0byBiZSBhbiBpbnRlZ2VyLiBGb3IgZXhhbXBsZToKCmBgYHtweXRob259CmRhdGEgPSBwZC5TZXJpZXMoCiAgWzAuMjUsIDAuNSwgMC43NSwgMS4wXSwKICBpbmRleCA9IFsiYSIsICJiIiwgImMiLCAiZCJdCikKCmRhdGEKYGBgCgojIyMgU2VyaWVzIGFzIHNwZWNpYWxpemVkIGRpY3Rpb25hcnkKCkEgUGFuZGFzIGBzZXJpZXNgIGlzIGxpa2UgYSBzcGVjaWFsaXphdGlvbiBvZiBhIFB5dGhvbiBkaWN0aW9uYXJ5LiBBIGRpY3Rpb25hcnkgaXMgYSBzdHJ1Y3R1cmUgdGhhdCBtYXBzIGFyYml0cmFyeSBrZXlzIHRvIGEgc2V0IG9mIHR5cGVzIHZhbHVlcy4KCmBgYHtweXRob259CnBvcHVsYXRpb25fZGljdCA9IHsnQ2FsaWZvcm5pYSc6IDM4MzMyNTIxLAogICAgICAgICAgICAgICAgICAgJ1RleGFzJzogMjY0NDgxOTMsCiAgICAgICAgICAgICAgICAgICAnTmV3IFlvcmsnOiAxOTY1MTEyNywKICAgICAgICAgICAgICAgICAgICdGbG9yaWRhJzogMTk1NTI4NjAsCiAgICAgICAgICAgICAgICAgICAnSWxsaW5vaXMnOiAxMjg4MjEzNX0KcG9wdWxhdGlvbiA9IHBkLlNlcmllcyhwb3B1bGF0aW9uX2RpY3QpCnBvcHVsYXRpb24KCnBvcHVsYXRpb25bIkNhbGlmb3JuaWEiXQpgYGAKCiMjIyBDb25zdHJ1Y3Rpbmcgc2VyaWVzIG9iamVjdHMKCkluIGdlbmVyYWwsIGNvbnN0cnVjdGluZyBhIHNlcmllcyBmb2xsb3dzIHRoaXMgZm9ybWF0OgoKYGBge3B5dGhvbiBldmFsID0gRkFMU0V9CnBkLlNlcmllcyhkYXRhLCBpbmRleCA9IGluZGV4KQpgYGAKCiMjIFRoZSBQYW5kYXMgRGF0YUZyYW1lIE9iamVjdAoKIyMjIERhdGFGcmFtZSBhcyBhIGdlbmVyYWxpemVkIE51bVB5IGFycmF5CgpMZXQncyBjb25zdHJ1Y3QgYSBuZXcgYFNlcmllc2A6CgpgYGB7cHl0aG9ufQphcmVhX2RpY3QgPSB7J0NhbGlmb3JuaWEnOiA0MjM5NjcsICdUZXhhcyc6IDY5NTY2MiwgJ05ldyBZb3JrJzogMTQxMjk3LAogICAgICAgICAgICAgJ0Zsb3JpZGEnOiAxNzAzMTIsICdJbGxpbm9pcyc6IDE0OTk5NX0KYXJlYSA9IHBkLlNlcmllcyhhcmVhX2RpY3QpCmFyZWEKYGBgCgpXZSBjYW4gdXNlIHRoZSBwb3B1bGF0aW9uIGRhdGEgZnJvbSBiZWZvcmUgdG8gY29uc3RydWN0IGEgc2luZ2xlIHR3by1kaW1lbnNpb25hbCBvYmplY3QgY29udGFpbmluZyB0aGlzIGluZm9ybWF0aW9uOgoKYGBge3B5dGhvbn0Kc3RhdGVzID0gcGQuRGF0YUZyYW1lKHsncG9wdWxhdGlvbic6IHBvcHVsYXRpb24sCiAgICAgICAgICAgICAgICAgICAgICAgJ2FyZWEnOiBhcmVhfSkKc3RhdGVzCmBgYAoKV2UgY2FuIGFjY2VzcyB0aGUgYXR0cmlidXRlcyBvZiBhbiBpbmRleCBsaWtlIHRoaXM6CgpgYGB7cHl0aG9ufQpzdGF0ZXMuaW5kZXgKYGBgCgpPciB0aGUgY29sdW1ucyBsaWtlIHRoaXM6CgpgYGB7cHl0aG9ufQpzdGF0ZXMuY29sdW1ucwpgYGAKCiMjIyBEYXRhRnJhbWUgYXMgYSBzcGVjaWFsaXplZCBkaWN0aW9uYXJ5CgpgYGB7cHl0aG9ufQpzdGF0ZXNbImFyZWEiXQpgYGAKCiMjIyBDb25zdHJ1Y3RpbmcgRGF0YUZyYW1lIG9iamVjdHMKCiMjIyMgRnJvbSBhIHNpbmdsZSBTZXJpZXMgb2JqZWN0CgpgYGB7cHl0aG9ufQpwZC5EYXRhRnJhbWUocG9wdWxhdGlvbiwgY29sdW1ucyA9IFsicG9wdWxhdGlvbiJdKQpgYGAKCiMjIyMgRnJvbSBhIGxpc3Qgb2YgZGljdHMKCmBgYHtweXRob259CmRhdGEgPSBbeydhJzogaSwgJ2InOiAyICogaX0KICAgICAgICBmb3IgaSBpbiByYW5nZSgzKV0KZGF0YQoKcGQuRGF0YUZyYW1lKGRhdGEpCmBgYAoKRXZlbiBpZiBzb21lIG9mIHRoZSBrZXlzIGluIHRoZSBkaWN0aW9uYXJ5IGFyZSBtaXNzaW5nLCBQYW5kYXMgd2lsbCBmaWxsIHRoZW0gaW4gd2l0aCBgTmFOYDoKCmBgYHtweXRob259CnBkLkRhdGFGcmFtZShbeydhJzogMSwgJ2InOiAyfSwgeydiJzogMywgJ2MnOiA0fV0pCmBgYAoKIyMjIyBGcm9tIGEgZGljdGlvbmFyeSBvZiBTZXJpZXMgb2JqZWN0cwoKYGBge3B5dGhvbn0KcGQuRGF0YUZyYW1lKHsncG9wdWxhdGlvbic6IHBvcHVsYXRpb24sCiAgICAgICAgICAgICAgJ2FyZWEnOiBhcmVhfSkKYGBgCgojIyMjIEZyb20gYSB0d28tZGltZW5zaW9uYWwgTnVtUHkgYXJyYXkKCmBgYHtweXRob259CnBkLkRhdGFGcmFtZShucC5yYW5kb20ucmFuZCgzLCAyKSwKICAgICAgICAgICAgIGNvbHVtbnM9Wydmb28nLCAnYmFyJ10sCiAgICAgICAgICAgICBpbmRleD1bJ2EnLCAnYicsICdjJ10pCmBgYAoKIyMjIyBGcm9tIGEgTnVtUHkgc3RydWN0dXJlZCBhcnJheQoKYGBge3B5dGhvbn0KQSA9IG5wLnplcm9zKDMsIGR0eXBlPVsoJ0EnLCAnaTgnKSwgKCdCJywgJ2Y4JyldKQpBCgpwZC5EYXRhRnJhbWUoQSkKYGBgCgojIyBUaGUgUGFuZGFzIEluZGV4IE9iamVjdAoKYGBge3B5dGhvbn0KaW5kID0gcGQuSW5kZXgoWzIsIDMsIDUsIDcsIDExXSkKaW5kCmBgYAoKIyMjIEluZGV4IGFzIGltbXV0YWJsZSBhcnJheQoKYGBge3B5dGhvbn0KaW5kWzFdCgppbmRbOjoyXQpgYGAKCkluZGljZXMgYXJlIGltbXV0YWJsZS4KCiMjIyBJbmRleCBhcyBvcmRlcmVkIHNldAoKVGhlIGBJbmRleGAgb2JqZWN0IGZvbGxvd3MgbWFueSBvZiB0aGUgY29udmVudGlvbnMgdXNlZCBieSBQeXRob24ncyBidWlsdC1pbiBgc2V0YCBkYXRhIHN0cnVjdHVyZSwgc28gdGhhdCB1bmlvbnMsIGludGVyc2VjdGlvbnMsIGRpZmZlcmVuY2VzLCBhbmQgb3RoZXIgY29tYmluYXRpb25zIGNhbiBiZSBjb21wdXRlZCBpbiBhIGZhbWlsaWFyIHdheS4KCmBgYHtweXRob259CmluZEEgPSBwZC5JbmRleChbMSwgMywgNSwgNywgOV0pCmluZEIgPSBwZC5JbmRleChbMiwgMywgNSwgNywgMTFdKQoKIyBpbnRlcnNlY3Rpb24KaW5kQSAmIGluZEIKCiMgdW5pb24KaW5kQSB8IGluZEIKCiMgc3ltbWV0cmljIGRpZmZlcmVuY2UKaW5kQSBeIGluZEIKYGBgCgojIERhdGEgSW5kZXhpbmcgYW5kIFNlbGVjdGlvbgoKIyMgRGF0YSBTZWxlY3Rpb24gaW4gU2VyaWVzCgojIyMgU2VyaWVzIGFzIGRpY3Rpb25hcnkKCmBgYHtweXRob259CmltcG9ydCBwYW5kYXMgYXMgcGQKZGF0YSA9IHBkLlNlcmllcyhbMC4yNSwgMC41LCAwLjc1LCAxLjBdLAogICAgICAgICAgICAgICAgIGluZGV4PVsnYScsICdiJywgJ2MnLCAnZCddKQpkYXRhCgpkYXRhWyJiIl0KYGBgCgpXZSBjYW4gYWxzbyB1c2UgZGljdGlvbmFyeS1saWtlIFB5dGhvbiBleHByZXNzaW9ucyBhbmQgbWV0aG9kcyB0byBleGFtaW5lIHRoZSBrZXlzL2luZGljZXMgYW5kIHZhbHVlczoKCmBgYHtweXRob259CiJhIiBpbiBkYXRhCgpkYXRhLmtleXMoKQoKbGlzdChkYXRhLml0ZW1zKCkpCmBgYAoKYFNlcmllc2Agb2JqZWN0cyBjYW4gYWxzbyBiZSBtb2RpZmllZCB3aXRoIGEgZGljdGlvbmFyeS1saWtlIHN5bnRheDoKCmBgYHtweXRob259CmRhdGFbImUiXSA9IDEuMjUKZGF0YQpgYGAKCiMjIyBTZXJpZXMgYXMgb25lLWRpbWVuc2lvbmFsIGFycmF5CgpBIGBzZXJpZXNgIGJ1aWxkcyBvbiB0aGUgZGljdGlvbmFyeS1saWtlIGludGVyZmFjZSBhbmQgcHJvdmlkZXMgYXJyYXktc3R5bGUgaXRlbSBzZWxlY3Rpb24gdmlhIHRoZSBzYW1lIGJhc2ljIG1lY2hhbmlzbXMgYXMgTnVtUHkgYXJyYXlzLgoKYGBge3B5dGhvbn0KZGF0YQoKIyBzbGljaW5nIGJ5IGV4cGxpY2l0IGluZGV4CmRhdGFbImEiOiJjIl0KCiMgc2xpY2luZyBieSBpbXBsaWNpdCBpbnRlZ2VyIGluZGV4CmRhdGFbMDoyXQoKIyBtYXNraW5nCmRhdGFbKGRhdGEgPiAwLjMpICYgKGRhdGEgPCAwLjgpXQoKIyBmYW5jeSBpbmRleGluZwpkYXRhW1siYSIsICJlIl1dCmBgYAoKIyMjIEluZGV4ZXJzOiBgbG9jYCwgYGlsb2NgLCBhbmQgYGl4YAoKSWYgeW91ciBgc2VyaWVzYCBoYXMgYW4gZXhwbGljaXQgaW50ZWdlciBpbmRleCwgYW4gaW5kZXhpbmcgb3BlcmF0aW9uIHN1Y2ggYXMgYGRhdGFbMV1gIHdpbGwgdXNlIHRoZSBleHBsaWNpdCBpbmRpY2VzLCB3aGlsZSBhIHNsaWNpbmcgb3BlcmF0aW9uIGxpa2UgYGRhdGFbMTozXWAgd2lsbCB1c2UgdGhlIFB5dGhvbi1zdHlsZSBpbmRleC4KCmBgYHtweXRob259CmRhdGEgPSBwZC5TZXJpZXMoWydhJywgJ2InLCAnYyddLCBpbmRleD1bMSwgMywgNV0pCmRhdGEKCiMgZXhwbGljaXQgaW5kZXggd2hlbiBpbmRleGluZwpkYXRhWzFdCgojIGltcGxpY2l0IGluZGV4IHdoZW4gc2xpY2luZwpkYXRhWzE6M10KYGBgCgpUbyBhdm9pZCBjb25mdXNpb24sIFBhbmRhcyBwcm92aWRlcyBzb21lIHNwZWNpYWwgaW5kZXhlciBhdHRyaWJ1dGVzLiBGaXJzdCwgdGhlIGBsb2NgIGF0dHJpYnV0ZSBhbGxvd3MgaW5kZXhpbmcgYW5kIHNsaWNpbmcgdGhhdCBhbHdheXMgcmVmZXJlbmNlcyB0aGUgZXhwbGljaXQgaW5kZXg6CgpgYGB7cHl0aG9ufQpkYXRhLmxvY1sxXQoKZGF0YS5sb2NbMTozXQpgYGAKClRoZSBgaWxvY2AgYXR0cmlidXRlIGFsbG93cyBpbmRleGluZyBhbmQgc2xpY2luZyB0aGF0IGFsd2F5cyByZWZlcmVuY2VzIHRoZSBpbXBsaWNpdCBQeXRob24tc3R5bGUgaW5kZXg6CgpgYGB7cHl0aG9ufQpkYXRhLmlsb2NbMV0KCmRhdGEuaWxvY1sxOjNdCmBgYAoKIyMgRGF0YSBTZWxlY3Rpb24gaW4gRGF0YUZyYW1lCgojIyMgRGF0YUZyYW1lIGFzIGEgZGljdGlvbmFyeQoKYGBge3B5dGhvbn0KYXJlYSA9IHBkLlNlcmllcyh7J0NhbGlmb3JuaWEnOiA0MjM5NjcsICdUZXhhcyc6IDY5NTY2MiwKICAgICAgICAgICAgICAgICAgJ05ldyBZb3JrJzogMTQxMjk3LCAnRmxvcmlkYSc6IDE3MDMxMiwKICAgICAgICAgICAgICAgICAgJ0lsbGlub2lzJzogMTQ5OTk1fSkKcG9wID0gcGQuU2VyaWVzKHsnQ2FsaWZvcm5pYSc6IDM4MzMyNTIxLCAnVGV4YXMnOiAyNjQ0ODE5MywKICAgICAgICAgICAgICAgICAnTmV3IFlvcmsnOiAxOTY1MTEyNywgJ0Zsb3JpZGEnOiAxOTU1Mjg2MCwKICAgICAgICAgICAgICAgICAnSWxsaW5vaXMnOiAxMjg4MjEzNX0pCmRhdGEgPSBwZC5EYXRhRnJhbWUoeydhcmVhJzphcmVhLCAncG9wJzpwb3B9KQpkYXRhCmBgYAoKVGhlIGBzZXJpZXNgIHRoYXQgbWFrZSB1cCB0aGUgY29sdW1ucyBvZiB0aGUgYERhdGFGcmFtZWAgY2FuIGJlIGFjY2Vzc2VkIHZpYSBkaWN0aW9uYXJ5LXN0eWxlIGluZGV4aW5nIG9mIHRoZSBjb2x1bW4gbmFtZToKCmBgYHtweXRob259CmRhdGFbImFyZWEiXQpgYGAKCldlIGNhbiBhbHNvIHVzZSBhdHRyaWJ1dGUtc3R5bGUgYWNjZXNzIHdpdGggY29sdW1uIG5hbWVzIHRoYXQgYXJlIHN0cmluZ3M6CgpgYGB7cHl0aG9ufQpkYXRhLmFyZWEKCmRhdGEuYXJlYSBpcyBkYXRhWyJhcmVhIl0KYGBgCgpEaWN0aW9uYXJ5LXN0eWxlIHN5bnRheCBjYW4gYWxzbyBiZSB1c2VkIHRvIG1vZGlmeSB0aGUgb2JqZWN0LCBpbiB0aGlzIGNhc2UgYWRkaW5nIGEgbmV3IGNvbHVtbjoKCmBgYHtweXRob259CmRhdGFbJ2RlbnNpdHknXSA9IGRhdGFbJ3BvcCddIC8gZGF0YVsnYXJlYSddCmRhdGEKYGBgCgojIyMgRGF0YUZyYW1lIGFzIHR3by1kaW1lbnNpb25hbCBhcnJheQoKYGBge3B5dGhvbn0KZGF0YS52YWx1ZXMKYGBgCgpXZSBjYW4gc3dhcCByb3dzIGFuZCBjb2x1bW5zIGxpa2UgdGhpczoKCmBgYHtweXRob259CmRhdGEuVApgYGAKClBhc3NpbmcgYSBzaW5nbGUgaW5kZXggdG8gYW4gYXJyYXkgYWNjZXNzZXMgYSByb3c6CgpgYGB7cHl0aG9ufQpkYXRhLnZhbHVlc1swXQpgYGAKCmFuZCBwYXNzaW5nIGEgc2luZ2xlICJpbmRleCIgdG8gYSBEYXRhRnJhbWUgYWNjZXNzZXMgYSBjb2x1bW46CgpgYGB7cHl0aG9ufQpkYXRhWyJhcmVhIl0KYGBgCgpTbywgZm9yIGFycmF5LXN0eWxlIGluZGV4aW5nLCB3ZSBuZWVkIGFub3RoZXIgY29udmVudGlvbi4gVXNpbmcgdGhlIGBpbG9jYCBpbmRleGVyLCB3ZSBjYW4gaW5kZXggdGhlIHVuZGVybHlpbmcgYXJyYXkgYXMgaWYgaXQgaXMgYSBzaW1wbGUgTnVtUHkgYXJyYXksIGJ1dCB0aGUgRGF0YUZyYW1lIGluZGV4IGFuZCBjb2x1bW4gbGFiZWxzIGFyZSBtYWludGFpbmVkIGluIHRoZSByZXN1bHQ6CgpgYGB7cHl0aG9ufQpkYXRhLmlsb2NbOjMsIDoyXQpgYGAKCldlIGNhbiBpbmRleCB0aGUgdW5kZXJseWluZyBkYXRhIGluIGFuIGFycmF5LWxpa2Ugc3R5bGUgYnV0IHVzaW5nIHRoZSBleHBsaWNpdCBpbmRleCBhbmQgY29sdW1uIG5hbWVzOgoKYGBge3B5dGhvbn0KZGF0YS5sb2NbOidJbGxpbm9pcycsIDoncG9wJ10KYGBgCgpUaGUgYGl4YCBpbmRleGVyIGFsbG93cyBhIGh5YnJpZCBvZiB0aGVzZSB0d28gYXBwcm9hY2hlczoKCmBgYHtweXRob259CmRhdGEuaXhbOjMsIDoicG9wIl0KYGBgCgpXaXRoIHRoZSBgbG9jYCBpbmRleGVyLCB3ZSBjYW4gY29tYmluZSBtYXNraW5nIGFuZCBmYW5jeSBpbmRleGluZyBhcyBpbiB0aGUgZm9sbG93aW5nOgoKYGBge3B5dGhvbn0KZGF0YS5sb2NbZGF0YS5kZW5zaXR5ID4gMTAwLCBbInBvcCIsICJkZW5zaXR5Il1dCmBgYAoKIyMjIEFkZGl0aW9uYWwgaW5kZXhpbmcgY29udmVudGlvbnMKCldoaWxlIGluZGV4aW5nIHJlZmVycyB0byBjb2x1bW5zLCBzbGljaW5nIHJlZmVycyB0byByb3dzOgoKYGBge3B5dGhvbn0KZGF0YVsiRmxvcmlkYSI6IklsbGlub2lzIl0KYGBgCgpTdWNoIHNsaWNlcyBjYW4gYWxzbyByZWZlciB0byB0b3dzIGJ5IG51bWJlciByYXRoZXIgdGhhbiBpbmRleDoKCmBgYHtweXRob259CmRhdGFbMTozXQpgYGAKCkRpcmVjdCBtYXNraW5nIG9wZXJhdGlvbnMgYXJlIGFsc28gaW50ZXJwcmV0ZWQgcm93LXdpc2UgcmF0aGVyIHRoYW4gY29sdW1uLXdpc2U6CgpgYGB7cHl0aG9ufQpkYXRhW2RhdGEuZGVuc2l0eSA+IDEwMF0KYGBgCgojIE9wZXJhdGluZyBvbiBEYXRhIGluIFBhbmRhcwo=</div>
 
 
 
