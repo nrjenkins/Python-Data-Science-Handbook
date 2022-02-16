@@ -385,3 +385,1346 @@ data[data.density > 100]
 ```
 
 # Operating on Data in Pandas
+
+Pandas inherits ufuncs from NumPy. One difference is that Pandas will preserve index and column labels in the output.
+
+## Ufuncs: Index Preservation
+
+NumPy ufuncs will work on Pandas `Series` and `DataFrame` objects.
+
+```{python}
+import pandas as pd
+import numpy as np
+
+rng = np.random.RandomState(42)
+ser = pd.Series(rng.randint(0, 10, 4))
+ser
+
+df = pd.DataFrame(rng.randint(0, 10, (3, 4)),
+                              columns = ["A", "B", "C", "D"])
+df
+```
+
+If we apply a NumPy ufunc on either of these objects, the result will be another Pandas object *with the indices preserved*:
+
+```{python}
+np.exp(ser)
+
+np.sin(df * np.pi / 4)
+```
+
+## Ufuncs: Index Alignment
+
+For binary operations, Pandas will Align indices in the process of performing the operation.
+
+### Index alignment in Series
+
+As an example, suppose we are combining two different data sources, and find only the top three US states by area and the top three US states by population:
+
+```{python}
+area = pd.Series({'Alaska': 1723337, 'Texas': 695662,
+                  'California': 423967}, name='area')
+
+population = pd.Series({'California': 38332521, 'Texas': 26448193,
+                        'New York': 19651127}, name='population')
+```
+
+Let's see what happens when we divide these to compute population density:
+
+```{python}
+population / area
+```
+
+### Index alignment in DataFrame
+
+A similar type of alignment takes place for *both* columns and indices when performing operations on `DataFrame`s:
+
+```{python}
+A = pd.DataFrame(rng.randint(0, 20, (2, 2)),
+                 columns=list('AB'))
+A
+
+B = pd.DataFrame(rng.randint(0, 10, (3, 3)),
+                 columns=list('BAC'))
+B
+
+A + B
+```
+
+## Ufuncs: Operations Between DataFrame and Series
+
+The index alignment is maintained when performing operations between DataFrames and Series.
+
+# Handling Missing Data
+
+## Trade-Offs in Missing Data Conventions
+
+There are two main strategies to indicate the presence of missing data: using a *mask* or choosing a *sentinel value*.
+
+## Missing Data in Pandas
+
+Pandas uses sentinels for missing data `NaN` and the `None` object.
+
+### `None`: Pythonic missing data
+
+```{python}
+import numpy as np
+import pandas as pd
+
+vals1 = np.array([1, None, 3, 4])
+vals1
+```
+
+If we let this be considered an object, then aggregations like `sum()` or `min()` across an array with a `None` will produce an error.
+
+### `NaN`: Missing numerical data
+
+`NaN` values are different because they support fast operations.
+
+```{python}
+vals2 = np.array([1, np.nan, 3, 4])
+vals2.dtype
+```
+
+When preforming aggregates over `NaN` values doesn't produce an error, but it returns `NaN`s:
+
+```{python}
+vals2.sum(), vals2.min(), vals2.max()
+```
+
+NumPy provides special aggregations that ignore these missing values:
+
+```{python}
+np.nansum(vals2), np.nanmin(vals2), np.nanmax(vals2)
+```
+
+### `NaN` and `None` in Pandas
+
+Pandas handles both `NaN` and `None` interchangeably:
+
+```{python}
+pd.Series([1, np.nan, 2, None])
+```
+
+Pandas automaticaly converts the `None` to a `NaN` value.
+
+## Operating on Null Values
+
+There are several methods for detecting, removing, and replacing null values in Pandas:
+
+-   `isnull()`: Generate a boolean mask indicating missing values
+
+-   `notnull()`: Opposite of `isnull()`
+
+-   `dropna()`: Return a filtered version of the data
+
+-   `fillna()`: Return a copy of the data with missing values filled or imputed
+
+### Detecting null values
+
+```{python}
+data = pd.Series([1, np.nan, "hello", None])
+data.isnull()
+
+data[data.notnull()]
+```
+
+### Dropping null values
+
+```{python}
+data.dropna()
+```
+
+There are more options for a `DataFrame`:
+
+```{python}
+df = pd.DataFrame([[1,      np.nan, 2],
+                   [2,      3,      5],
+                   [np.nan, 4,      6]])
+df
+```
+
+By default, `dropna()` will drop all rows in which *any* null value is present:
+
+```{python}
+df.dropna()
+```
+
+You can also drop along a different axis, like columns with `axis = 1`:
+
+```{python}
+df.dropna(axis = "columns")
+```
+
+You can change how much data is dropped with the `how` and `thresh` parameters.
+
+```{python}
+df[3] = np.nan
+df
+
+df.dropna(axis = "columns", how = "all")
+
+df.dropna(axis = "rows", thresh = 3)
+```
+
+### Filling null values
+
+Instead of dropping `NA` values, we can also replace them with another value.
+
+```{python}
+data = pd.Series([1, np.nan, 2, None, 3], index=list('abcde'))
+data
+
+data.fillna(0)
+
+# fill forward
+data.fillna(method = "ffill")
+
+# back fill
+data.fillna(method = "bfill")
+```
+
+These methods also work with `DataFrame`s:
+
+```{python}
+df
+
+df.fillna(method = "ffill", axis = 1)
+```
+
+# Hierarchical Indexing
+
+Hierarchical indexing is used to incorporate multiple index levels within a single index. Here we explore the creation of `MultiIndex` objects.
+
+```{python}
+import pandas as pd
+import numpy as np
+```
+
+## A multiply Indexed Series
+
+We'll start by looking at how we can represent two-dimensional data within a one-dimensional `Series`.
+
+### The better way: Pandas Multindex
+
+Suppose you want to track data about states from two different years.
+
+```{python}
+index = [('California', 2000), ('California', 2010),
+         ('New York', 2000), ('New York', 2010),
+         ('Texas', 2000), ('Texas', 2010)]
+populations = [33871648, 37253956,
+               18976457, 19378102,
+               20851820, 25145561]
+pop = pd.Series(populations, index=index)
+pop
+
+index = pd.MultiIndex.from_tuples(index)
+index
+
+pop = pop.reindex(index)
+pop
+```
+
+Now to access all data for which the second index is 2012, we use the Pandas slicing notation:
+
+```{python}
+pop[:, 2010]
+```
+
+### MultiIndex as extra dimension
+
+Instead of storing the data in rows, we could have used columns:
+
+```{python}
+pop_df = pop.unstack()
+pop_df
+```
+
+`stack()` puts the data back:
+
+```{python}
+pop_df.stack()
+```
+
+## Methods of MultiIndex Creation
+
+The easiest way to construct a multiply indexed `Series` or `DataFrame` is to pass a list of two or more index arrays to the constructor:
+
+```{python}
+df = pd.DataFrame(np.random.rand(4, 2),
+                  index=[['a', 'a', 'b', 'b'], [1, 2, 1, 2]],
+                  columns=['data1', 'data2'])
+df
+```
+
+Or:
+
+```{python}
+data = {('California', 2000): 33871648,
+        ('California', 2010): 37253956,
+        ('Texas', 2000): 20851820,
+        ('Texas', 2010): 25145561,
+        ('New York', 2000): 18976457,
+        ('New York', 2010): 19378102}
+pd.Series(data)
+```
+
+### Explicit MultiIndex constructors
+
+You can also use the class method construtors available in the `pd.MultiIndex`:
+
+```{python}
+pd.MultiIndex.from_arrays([['a', 'a', 'b', 'b'], [1, 2, 1, 2]])
+```
+
+# Combining Datasets: Concat and Append
+
+Here we look at how to concatenate `Series` and `DataFrame`s.
+
+```{python}
+import pandas as pd
+import numpy as np
+
+# function to quickly make a DataFrame
+def make_df(cols, ind):
+    """Quickly make a DataFrame"""
+    data = {c: [str(c) + str(i) for i in ind]
+            for c in cols}
+    return pd.DataFrame(data, ind)
+
+# example DataFrame
+make_df('ABC', range(3))
+
+# class that allows for display of multiple `DataFrames` side by side
+class display(object):
+    """Display HTML representation of multiple objects"""
+    template = """<div style="float: left; padding: 10px;">
+    <p style='font-family:"Courier New", Courier, monospace'>{0}</p>{1}
+    </div>"""
+    def __init__(self, *args):
+        self.args = args
+        
+    def _repr_html_(self):
+        return '\n'.join(self.template.format(a, eval(a)._repr_html_())
+                         for a in self.args)
+    
+    def __repr__(self):
+        return '\n\n'.join(a + '\n' + repr(eval(a))
+                           for a in self.args)
+    
+```
+
+## Recall: Concatenation of NumPy Arrays
+
+You can combine NumPy arrays with `np.concatenate`
+
+```{python}
+x = [1, 2, 3]
+y = [4, 5, 6]
+z = [7, 8, 9]
+np.concatenate([x, y, z])
+```
+
+## Simple Concatenation with `pd.concat`
+
+`pd.concat()` works in a similar with but provides a number of different options:
+
+```{python eval = FALSE}
+pd.concat(objs, axis=0, join='outer', join_axes=None, ignore_index=False,
+          keys=None, levels=None, names=None, verify_integrity=False,
+          copy=True)
+```
+
+```{python}
+ser1 = pd.Series(['A', 'B', 'C'], index=[1, 2, 3])
+ser2 = pd.Series(['D', 'E', 'F'], index=[4, 5, 6])
+pd.concat([ser1, ser2])
+```
+
+You can also concatenate `DataFrames`:
+
+```{python}
+df1 = make_df('AB', [1, 2])
+df2 = make_df('AB', [3, 4])
+display('df1', 'df2', 'pd.concat([df1, df2])')
+```
+
+### Duplicate indices
+
+Pandas concatenation *preserves indices* where NumPy concatenations do not.
+
+```{python}
+x = make_df('AB', [0, 1])
+y = make_df('AB', [2, 3])
+y.index = x.index  # make duplicate indices!
+display('x', 'y', 'pd.concat([x, y])')
+```
+
+### Concatenation with joins
+
+Concatenations works well when we have two datasets with the same column names. Consider concatenation of two `DataFrames` which don't have all columns in common:
+
+```{python}
+df5 = make_df('ABC', [1, 2])
+df6 = make_df('BCD', [3, 4])
+display('df5', 'df6', 'pd.concat([df5, df6])')
+```
+
+We can change how the `NA` values are handled with the `join` option. By default, the join is a union of the input columns (`join = "outer"`), but we can change this to an intersection of the columns using `join = "inner"`:
+
+```{python}
+display('df5', 'df6', "pd.concat([df5, df6], join='inner')")
+```
+
+### The `append()` method
+
+Rather than calling `pd.concat([df1, df2])`, you can call `df1.append(df2`:
+
+```{python}
+display("df1", "df2", "df1.append(df2)")
+```
+
+# Combining Datasets: Merge and Join
+
+Merge operations in Pandas are accomplished with the `pd.merge` function.
+
+## Categories of Joins
+
+### One-to-one joins
+
+These are the simplest type of joins and are similar to column-wise concatenation. Consider the following DataFrames which contain information on several employees in a company:
+
+```{python}
+df1 = pd.DataFrame({'employee': ['Bob', 'Jake', 'Lisa', 'Sue'],
+                    'group': ['Accounting', 'Engineering', 'Engineering', 'HR']})
+df2 = pd.DataFrame({'employee': ['Lisa', 'Bob', 'Jake', 'Sue'],
+                    'hire_date': [2004, 2008, 2012, 2014]})
+display('df1', 'df2')
+```
+
+We combine this into a single DataFrame with `pd.merge`:
+
+```{python}
+df3 = pd.merge(df1, df2)
+df3
+```
+
+### Many-to-one joins
+
+Many-to-one joins are jons in which one of the two key columns contains duplicate entries.
+
+```{python}
+df4 = pd.DataFrame({'group': ['Accounting', 'Engineering', 'HR'],
+                    'supervisor': ['Carly', 'Guido', 'Steve']})
+display('df3', 'df4', 'pd.merge(df3, df4)')
+```
+
+### Many-to-many joins
+
+If the key column in both the left and right array contains duplicates, then the result is a many-to-many merge.
+
+```{python}
+df5 = pd.DataFrame({'group': ['Accounting', 'Accounting',
+                              'Engineering', 'Engineering', 'HR', 'HR'],
+                    'skills': ['math', 'spreadsheets', 'coding', 'linux',
+                               'spreadsheets', 'organization']})
+display('df1', 'df5', "pd.merge(df1, df5)")
+```
+
+## Specification of the Merge Key
+
+The default behavior of `pd.merge` is to look for one or more matching column names between the two inputs, and use this as the key. But the column names do not always match and there are a number of options for dealing with this.
+
+### The `on` keyword
+
+You can specify the name of the key column using the `on` keyword, which takes a column name or a list of column names:
+
+```{python}
+display('df1', 'df2', "pd.merge(df1, df2, on='employee')")
+```
+
+### The `left_on` and `right_on` keywords
+
+We can use `left_on` and `right_on` to merge datasets that have different names for the key columns.
+
+```{python}
+df3 = pd.DataFrame({'name': ['Bob', 'Jake', 'Lisa', 'Sue'],
+                    'salary': [70000, 80000, 120000, 90000]})
+display('df1', 'df3', 'pd.merge(df1, df3, left_on="employee", right_on="name")')
+```
+
+This results in a redundant column that we can drop with the `drop()` method:
+
+```{python}
+pd.merge(df1, df3, left_on = "employee", right_on = "name").drop("name", axis = 1)
+```
+
+### The `left_index` and `right_index` keywords
+
+Instead of merging on a column, you might want to merge on an index. For example, your data might look like this:
+
+```{python}
+df1a = df1.set_index('employee')
+df2a = df2.set_index('employee')
+display('df1a', 'df2a')
+```
+
+You can use the index as the key for merging by specifying the `left_index` and/or `right_index` flags in `pd.merge()`:
+
+```{python}
+df1a
+df2a
+pd.merge(df1a, df2a, left_index = True, right_index = True)
+```
+
+DataFrames implement the `join()` method, which performs a merge that defaults to joining on indices.
+
+## Specifying Set Arithmetic for Joins
+
+```{python}
+df6 = pd.DataFrame({'name': ['Peter', 'Paul', 'Mary'],
+                    'food': ['fish', 'beans', 'bread']},
+                   columns=['name', 'food'])
+df7 = pd.DataFrame({'name': ['Mary', 'Joseph'],
+                    'drink': ['wine', 'beer']},
+                   columns=['name', 'drink'])
+display('df6', 'df7', 'pd.merge(df6, df7)')
+```
+
+By default, `pd.merge` uses the intersection of the two sets which is known as an *inner* join. Other options are `outer`, `left`, and `right`.
+
+An *outer join* returns a join over the union of the input columns, and fills in all missing values with `NA`s:
+
+```{python}
+pd.merge(df6, df7, how = "outer")
+```
+
+The *left join* and *right join* return joins over the left entries and right entries, respectively.
+
+```{python}
+pd.merge(df6, df7, how = "left")
+
+pd.merge(df6, df7, how = "right")
+```
+
+## Overlapping Column Names: The `suffixes` Keyword
+
+You may end up in a case where your two input DataFrames have conflicting column names:
+
+```{python}
+df8 = pd.DataFrame({'name': ['Bob', 'Jake', 'Lisa', 'Sue'],
+                    'rank': [1, 2, 3, 4]})
+df9 = pd.DataFrame({'name': ['Bob', 'Jake', 'Lisa', 'Sue'],
+                    'rank': [3, 1, 4, 2]})
+display('df8', 'df9', 'pd.merge(df8, df9, on="name")')
+```
+
+You can change the suffixes the merge uses like this:
+
+```{python}
+pd.merge(df8, df9, on="name", suffixes=["_L", "_R"])
+```
+
+## Example: US States Data
+
+Here we consider data about US states and their populations found here: <https://github.com/jakevdp/data-USstates/>.
+
+```{python}
+abbrevs = pd.read_csv("https://raw.githubusercontent.com/jakevdp/data-USstates/master/state-abbrevs.csv")
+areas = pd.read_csv("https://raw.githubusercontent.com/jakevdp/data-USstates/master/state-areas.csv")
+pop = pd.read_csv("https://raw.githubusercontent.com/jakevdp/data-USstates/master/state-population.csv")
+
+display('pop.head()', 'areas.head()', 'abbrevs.head()')
+```
+
+With this data, we want to rank US states by their 2010 population density. We'll start with a many-to-one merge that will give us the full state name within the population DataFrame:
+
+```{python}
+pop_data = pd.merge(pop, abbrevs, left_on = "state/region", 
+                    right_on = "abbreviation", how = "left")
+pop_data.head()
+```
+
+Let's check for mismatches by looking for rows with nulls:
+
+```{python}
+pop_data.isnull().any()
+```
+
+Some of the `population` info is null; let's figure out where these are:
+
+```{python}
+pop_data[pop_data["population"].isnull()].head()
+```
+
+The population data includes Puerto Rico and the US as a whole but the state data doesn't. We can fix the mismatches by filling in new values:
+
+```{python}
+pop_data.loc[pop_data["state/region"] == "PR", "state"] = "Puerto Rico"
+pop_data.loc[pop_data["state/region"] == "USA", "state"] = "United States"
+
+pop_data.isnull().any()
+```
+
+Now we merge the result with the area data:
+
+```{python}
+pop_data = pd.merge(pop_data, areas, how = "left", on = "state")
+
+pop_data.head()
+```
+
+Let's check for mismatches:
+
+```{python}
+pop_data.isnull().any()
+```
+
+We can look at which regions have nulls in the `area` column like this:
+
+```{python}
+pop_data["state"][pop_data["area (sq. mi)"].isnull()].unique()
+```
+
+We can drop United States:
+
+```{python}
+pop_data.dropna(inplace = True)
+pop_data.head()
+```
+
+Now we can answer our question of interest. Let's first select the portion of the data corresponding with the year 2010 and the total population with `query()`:
+
+```{python}
+data2010 = pop_data.query("year == 2010 & ages == 'total'")
+data2010.head()
+```
+
+Now calculate population density.
+
+```{python}
+data2010.set_index("state", inplace = True)
+density = data2010["population"] / data2010["area (sq. mi)"]
+
+density.sort_values(ascending = False, inplace = True)
+density.head()
+```
+
+# Aggregation and Grouping
+
+## Planets Data
+
+Here we use the planets dataset which gives data on planets that astronomers have discovered around other starts.
+
+```{python}
+import seaborn as sns
+planets = sns.load_dataset("planets")
+planets.head()
+```
+
+## Simple Aggregation in Pandas
+
+Let's examine some descriptive statistics after dropping missing values:
+
+```{python}
+planets.dropna().describe()
+
+(planets
+  .dropna()
+  .describe())
+  
+(planets
+  .dropna()
+  .mean()
+)
+```
+
+Here is a list of some other built-in Pandas aggregations:
+
+| Aggregation          | Description                     |
+|:---------------------|:--------------------------------|
+| `count()`            | Total number of items           |
+| `first()`, `last()`  | First and last item             |
+| `mean()`, `median()` | Mean and median                 |
+| `min()`, `max()`     | Minimum and maximum             |
+| `std()`, `var()`     | Standard deviation and variance |
+| `mad()`              | Mean absolute deviation         |
+| `prod()`             | Product of all items            |
+| `sum()`              | Sum of all items                |
+
+These are all methods of DataFrame and Series objects.
+
+The next level of data summarization is the `groupby` operation, which allows you to quickly and efficiently compute aggregates on subsets of data.
+
+## GroupBy: Split, Apply, Combine
+
+### Split, apply, combine
+
+![Source: Python Data Science Handbook](https://jakevdp.github.io/PythonDataScienceHandbook/figures/03.08-split-apply-combine.png)
+
+This explains what `groupby` accomplishes:
+
+-   The *split* step involves breaking up and grouping a DataFrame depending on the value of the specified key
+
+-   The *apply* step involves computing some function, usually an aggregate, transformation, or filtering, within the individual groups
+
+-   The *combine* step merges the results of these operations into an output array
+
+```{python}
+df = pd.DataFrame({'key': ['A', 'B', 'C', 'A', 'B', 'C'],
+                   'data': range(6)}, columns=['key', 'data'])
+df
+```
+
+```{python}
+df.groupby("key").sum()
+```
+
+### The GroupBy object
+
+#### Column indexing
+
+```{python}
+planets.groupby("method")
+
+planets.groupby("method")["orbital_period"]
+```
+
+Here we selected a particular Series group from the DataFrame group by reference to its column name.
+
+```{python}
+(planets
+  .groupby("method")["orbital_period"]
+  .median()
+)
+```
+
+#### Iteration over groups
+
+```{python}
+for (method, group) in planets.groupby('method'):
+    print("{0:30s} shape={1}".format(method, group.shape))
+    
+```
+
+#### Dispatch methods
+
+You can use the `describe()` method of DataFrames to perform a set of aggregations that describe each group in the data:
+
+```{python}
+(planets
+  .groupby("method")["year"]
+  .describe()
+)
+```
+
+### Aggregate, filter, transform, apply
+
+`groupby` objects have `aggregate()`, `filter()`, `transform()`, and `apply()` methods that efficiently implement a variety of useful operations before combining the grouped data.
+
+```{python}
+rng = np.random.RandomState(0)
+df = pd.DataFrame({'key': ['A', 'B', 'C', 'A', 'B', 'C'],
+                   'data1': range(6),
+                   'data2': rng.randint(0, 10, 6)},
+                   columns = ['key', 'data1', 'data2'])
+df
+```
+
+#### Aggregation
+
+The `aggregate()` method can take a string, a function, or a list thereof, and compute all the aggregates at once.
+
+```{python}
+(
+  df
+    .groupby("key")
+    .aggregate([min, np.median, max])
+)
+```
+
+You can also pass dictionary mapping column names to operations:
+
+```{python}
+(
+  df
+    .groupby("key")
+    .aggregate({"data1": "min",
+                "data2": "max"})
+)
+```
+
+#### Filtering
+
+Filtering allows you to drop data based on the group properties. For example, we might want to keep all groups in which the standard deviation is larger than some critical value:
+
+```{python}
+def filter_func(x):
+    return x['data2'].std() > 4
+
+
+(
+  df
+    .groupby("key")
+    .filter(filter_func)
+)
+```
+
+#### Transformation
+
+While aggregation must return a reduced version of the data, transformation can return some transformed version of the full data to recombine. A common example is to center the data by subtracting the group-wise mean:
+
+```{python}
+(
+  df
+  .groupby("key")
+  .transform(lambda x: x - x.mean())
+)
+```
+
+#### The `apply()` method
+
+The `apply()` method lets you apply an arbitrary function to the group results. Here is an example that normalizes the first column by the sum of the second:
+
+```{python}
+def norm_by_data2(x):
+    # x is a DataFrame of group values
+    x['data1'] /= x['data2'].sum()
+    return x
+
+df.groupby("key").apply(norm_by_data2)
+```
+
+### Specifying the split key
+
+DataFrames can be split by many columns.
+
+#### A list, array, series, or index providing the grouping keys
+
+# Pivot Tables
+
+A pivot table takes simple column-wise data as input, and groups the entries into a two-dimensional table that provides a multidimensional summarization of the data.
+
+## Motivating Pivot Tables
+
+We'll use the database of passengers on the *Titanic* as example data:
+
+```{python}
+import numpy as np
+import pandas as pd
+import seaborn as sns
+
+titanic = sns.load_dataset("titanic")
+titanic.head()
+```
+
+## Pivot Tables by Hand
+
+Let's compare survival rates for men and women:
+
+```{python}
+(
+  titanic
+  .groupby("sex")[["survived"]]
+  .mean()
+)
+```
+
+Let's compare the survival rates for sex and class:
+
+```{python}
+(
+  titanic
+  .groupby(["sex", "class"])["survived"]
+  .mean()
+  .unstack()
+)
+```
+
+## Pivot Table Syntax
+
+Here is the equivalent to the preceding operation using the `pivot_table` method of DataFrames:
+
+```{python}
+(
+  titanic
+  .pivot_table("survived", index = "sex", columns = "class")
+)
+```
+
+### Multi-level pivot tables
+
+Pivot tables can be specified with multiple levels. For example, we might be interested in looking at age as a third dimension:
+
+```{python}
+(
+  titanic
+  .assign(age = lambda x: pd.cut(titanic["age"], [0, 18, 80]))
+  .pivot_table("survived", ["sex", "age"], "class")
+)
+```
+
+We can also add in information to the columns:
+
+```{python}
+(
+  titanic
+  .assign(age = lambda x: pd.cut(titanic["age"], [0, 18, 80]),
+          fare = lambda x: pd.qcut(titanic["fare"], 2))
+  .pivot_table("survived", ["sex", "age"], ["fare", "class"])
+)
+```
+
+### Additional pivot table options
+
+```{python}
+# call signature as of Pandas 0.18
+DataFrame.pivot_table(data, values=None, index=None, columns=None,
+                      aggfunc='mean', fill_value=None, margins=False,
+                      dropna=True, margins_name='All')
+```
+
+## Example: Birthrate Data
+
+Let's look at birthrate data as another example.
+
+```{python}
+birth_data = pd.read_csv("https://raw.githubusercontent.com/jakevdp/data-CDCbirths/master/births.csv")
+
+birth_data.head()
+```
+
+Let's investigate the data with a pivot table. We'll add a decade column and look at male and female births as a function of decade:
+
+```{python}
+(
+  birth_data
+  .assign(decade = lambda x: 10 * (birth_data["year"] // 10))
+  .pivot_table("births", index = "decade", columns = "gender", aggfunc = "sum")
+)
+```
+
+Let's visualize total births by year:
+
+```{python}
+import matplotlib.pyplot as plt
+sns.set()
+
+(
+  birth_data
+  .assign(decade = lambda x: 10 * (birth_data["year"] // 10))
+  .pivot_table("births", index = "year", columns = "gender", aggfunc = "sum")
+  .plot()
+)
+plt.show()
+plt.clf()
+```
+
+### Further data exploration
+
+# Vectorized String Operations
+
+## Introducing Pandas String Operations
+
+Pandas provides the functionality for vectorized string operations. For example:
+
+```{python}
+import pandas as pd
+
+data = ['peter', 'Paul', 'MARY', 'gUIDO']
+names = pd.Series(data)
+names
+
+names.str.capitalize()
+```
+
+## Tables of Pandas String Methods
+
+```{python}
+monte = pd.Series(['Graham Chapman', 'John Cleese', 'Terry Gilliam',
+                   'Eric Idle', 'Terry Jones', 'Michael Palin'])
+```
+
+### Methods similar to Pythons string methods
+
+|            |                |                |                |
+|------------|----------------|----------------|----------------|
+| `len()`    | `lower()`      | `translate()`  | `islower()`    |
+| `ljust()`  | `upper()`      | `startswith()` | `isupper()`    |
+| `rjust()`  | `find()`       | `endswith()`   | `isnumeric()`  |
+| `center()` | `rfind()`      | `isalnum()`    | `isdecimal()`  |
+| `zfill()`  | `index()`      | `isalpha()`    | `split()`      |
+| `strip()`  | `rindex()`     | `isdigit()`    | `rsplit()`     |
+| `rstrip()` | `capitalize()` | `isspace()`    | `partition()`  |
+| `lstrip()` | `swapcase()`   | `istitle()`    | `rpartition()` |
+
+```{python}
+monte.str.lower()
+
+monte.str.len()
+
+monte.str.startswith("T")
+
+monte.str.split()
+```
+
+### Methods using regular expressions
+
+There are several methods that accept regular expressions to examine the content of each string element:
+
+| Method       | Description                                                             |
+|:-------------|:------------------------------------------------------------------------|
+| `match()`    | Call `re.match()` on each element, returning a boolean.                 |
+| `extract()`  | Call `re.match()` on each element, returning matched groups as strings. |
+| `findall()`  | Call `re.findall()` on each element                                     |
+| `replace()`  | Replace occurrences of pattern with some other string                   |
+| `contains()` | Call `re.search()` on each element, returning a boolean                 |
+| `count()`    | Count occurrences of pattern                                            |
+| `split()`    | Equivalent to `str.split()`, but accepts regexps                        |
+| `rsplit()`   | Equivalent to `str.rsplit()`, but accepts regexps                       |
+
+Using these, we can do things like extract the first name from each by asking for a contiguous group of characters at the beginning of each element:
+
+```{python}
+monte.str.extract("([A-Za-z]+)", expand = False)
+```
+
+Or we can find all the names that start and end with a consonant with the start-of-string (`^`) and end-of-string (`$`):
+
+```{python}
+monte.str.findall(r"^[^AEIOU].*[^aeiou]$")
+```
+
+### Miscellaneous methods
+
+| Method            | Description                                                       |
+|:------------------|:------------------------------------------------------------------|
+| `get()`           | Index each element                                                |
+| `slice()`         | Slice each element                                                |
+| `slice_replace()` | Replace slice in each element with passed value                   |
+| `cat()`           | Concatenate strings                                               |
+| `repeat()`        | Repeat values                                                     |
+| `normalize()`     | Return Unicode form of string                                     |
+| `pad()`           | Add whitespace to left, right, or both sides of strings           |
+| `wrap()`          | Split long strings into lines with length less than a given width |
+| `join()`          | Join strings in each element of the Series with passed separator  |
+| `get_dummies()`   | extract dummy variables as a dataframe                            |
+
+#### Vectorized item access and slicing
+
+You can slice the first three characters of each array using `str.slice(0, 3)`
+
+```{python}
+monte.str[0:3]
+
+monte.str.slice(0, 3)
+```
+
+#### Indicator variables
+
+The `get_dummies()` method is useful when your data has a column containing some sort of coded indicator.
+
+```{python}
+full_monte = pd.DataFrame({'name': monte,
+                           'info': ['B|C|D', 'B|D', 'A|C',
+                                    'B|D', 'B|C', 'B|C|D']})
+full_monte
+
+full_monte["info"].str.get_dummies("|")
+```
+
+## Example: Recipe Database
+
+# Working with Time Series
+
+Pandas has numerous tools for working with date and time data:
+
+-   *Time stamps* reference particular moments in time
+
+-   *Time intervals* and *periods* reference a length of time between a particular beginning and end point
+
+-   *Time deltas* or *durations* reference an exact length of time
+
+## Dates and Times in Python
+
+### Native Python dates and time: `datetime` and `dateutil`
+
+The `datetime` module allows you to work with dates in native Python:
+
+```{python}
+from datetime import datetime
+datetime(year = 2015, month = 7, day = 4)
+```
+
+You can parse dates from a variety of time formats using `dateutil`:
+
+```{python}
+from dateutil import parser
+date = parser.parse("4th of July, 2015")
+date
+```
+
+### Typed arrays of time: NumPy's `datetime64`
+
+```{python}
+import numpy as np
+date = np.array("2015-07-04", dtype = np.datetime64)
+date
+```
+
+With this, we can perform vectorized operations:
+
+```{python}
+date + np.arange(12)
+```
+
+Here is a table of the available format codes:
+
+| Code | Meaning     | Time span (relative) | Time span (absolute)     |
+|:-----|:------------|:---------------------|:-------------------------|
+| `Y`  | Year        | ± 9.2e18 years       | \[9.2e18 BC, 9.2e18 AD\] |
+| `M`  | Month       | ± 7.6e17 years       | \[7.6e17 BC, 7.6e17 AD\] |
+| `W`  | Week        | ± 1.7e17 years       | \[1.7e17 BC, 1.7e17 AD\] |
+| `D`  | Day         | ± 2.5e16 years       | \[2.5e16 BC, 2.5e16 AD\] |
+| `h`  | Hour        | ± 1.0e15 years       | \[1.0e15 BC, 1.0e15 AD\] |
+| `m`  | Minute      | ± 1.7e13 years       | \[1.7e13 BC, 1.7e13 AD\] |
+| `s`  | Second      | ± 2.9e12 years       | \[ 2.9e9 BC, 2.9e9 AD\]  |
+| `ms` | Millisecond | ± 2.9e9 years        | \[ 2.9e6 BC, 2.9e6 AD\]  |
+| `us` | Microsecond | ± 2.9e6 years        | \[290301 BC, 294241 AD\] |
+| `ns` | Nanosecond  | ± 292 years          | \[ 1678 AD, 2262 AD\]    |
+| `ps` | Picosecond  | ± 106 days           | \[ 1969 AD, 1970 AD\]    |
+| `fs` | Femtosecond | ± 2.6 hours          | \[ 1969 AD, 1970 AD\]    |
+| `as` | Attosecond  | ± 9.2 seconds        | \[ 1969 AD, 1970 AD\]    |
+
+### Dates and times in pandas: best of both worlds
+
+Pandas provides a `Timestamp` object. With the Pandas tools, we can parse a formatted string date and use format codes to output the day of the week:
+
+```{python}
+import pandas as pd
+date = pd.to_datetime("4th of July, 2015")
+date
+
+date.strftime("%A")
+```
+
+We can also do NumPy-style operations:
+
+```{python}
+import numpy as np
+date + pd.to_timedelta(np.arange(12), "D")
+```
+
+## Pandas Time Series: Indexing by Time
+
+Pandas time series tools become useful when you index data by timestamps:
+
+```{python}
+index = pd.DatetimeIndex(["2014-07-04", "2014-08-04", "2015-07-04", 
+                           "2015-08-04"])
+data = pd.Series([0, 1, 2, 3], index = index)
+data
+```
+
+## Pandas Time Series Data Structures
+
+-   For *time stamps*, Pandas provides the `Timestamp` type. As mentioned before, it is essentially a replacement for Python's native `datetime`, but is based on the more efficient `numpy.datetime64` data type. The associated Index structure is `DatetimeIndex`.
+
+-   For *time Periods*, Pandas provides the `Period` type. This encodes a fixed-frequency interval based on `numpy.datetime64`. The associated index structure is `PeriodIndex`.
+
+-   For *time deltas* or *durations*, Pandas provides the `Timedelta` type. `Timedelta` is a more efficient replacement for Python's native `datetime.timedelta` type, and is based on `numpy.timedelta64`. The associated index structure is `TimedeltaIndex`.
+
+```{python}
+dates = pd.to_datetime([datetime(2015, 7, 3), '4th of July, 2015',
+                       '2015-Jul-6', '07-07-2015', '20150708'])
+dates
+```
+
+### Regular sequences: `pd.date_range()`
+
+We can create a regular sequence of dates like this:
+
+```{python}
+pd.date_range("2015-07-03", "2015-07-10")
+```
+
+Instead of specifying the start and end point, we can use a number of periods:
+
+```{python}
+pd.date_range("2015-07-03", periods = 8)
+```
+
+The interval can be modified with the `freq` argument:
+
+```{python}
+pd.date_range("2015-07-03", periods = 8, freq = "H")
+```
+
+## Frequencies and Offsets
+
+| Code | Description  | Code | Description          |
+|:-----|:-------------|:-----|:---------------------|
+| `D`  | Calendar day | `B`  | Business day         |
+| `W`  | Weekly       |      |                      |
+| `M`  | Month end    | `BM` | Business month end   |
+| `Q`  | Quarter end  | `BQ` | Business quarter end |
+| `A`  | Year end     | `BA` | Business year end    |
+| `H`  | Hours        | `BH` | Business hours       |
+| `T`  | Minutes      |      |                      |
+| `S`  | Seconds      |      |                      |
+| `L`  | Milliseonds  |      |                      |
+| `U`  | Microseconds |      |                      |
+| `N`  | nanoseconds  |      |                      |
+
+## Resampling, Shifting, and Windowing
+
+We can import financial data with `pandas-datareader`:
+
+```{python}
+from pandas_datareader import data
+
+google = data.DataReader("GOOG", start = "2004", end = "2016",
+                         data_source = "google")
+google.head()
+```
+
+## Example: Visualizing Seattle Bicycle Counts
+
+```{python}
+data = pd.read_csv("data/Fremont_Bridge_Bicycle_Counter.csv", 
+                   index_col = "Date",
+                   parse_dates = True)
+data.head()
+```
+
+Let's shorten the columns names:
+
+```{python}
+data.columns = ["Total", "West", "East"]
+data
+
+data.dropna().describe()
+```
+
+### Visualizing the data
+
+```{python}
+import seaborn; seaborn.set()
+import matplotlib.pyplot as plt
+
+data.plot()
+plt.show()
+plt.clf()
+```
+
+Let's resample the data to a coarser grid:
+
+```{python}
+weekly = data.resample("W").sum()
+
+weekly.plot(style = [":", "--", "-"])
+plt.ylabel("Weekly bicycle count");
+plt.show()
+plt.clf()
+```
+
+Another useful too for aggregating the data is to use a rolling mean with `pd.rolling_mean()`. Here we'll calculate a 30 day rolling mean of our data and center the window:
+
+```{python}
+daily = (data
+  .resample("D")
+  .sum()
+  .rolling(30, center = True)
+  .sum()
+  .plot(style = [":", "--", "-"])
+)
+plt.ylabel("mean hourly count")
+plt.show()
+plt.clf()
+```
+
+We can make the plot lines smoother using a Gaussian window:
+
+```{python}
+daily = (data
+  .resample("D")
+  .sum()
+  .rolling(50, center = True, win_type = "gaussian")
+  .sum(std = 10)
+  .plot(style = [":", "--", "-"])
+)
+plt.ylabel("mean hourly count")
+plt.show()
+plt.clf()
+```
+
+### Digging into the data
+
+Let's examine the average traffic by the time of day:
+
+```{python}
+by_time = (
+  data
+  .groupby(data.index.time)
+  .mean()
+)
+
+hourly_ticks = 4 * 60 * 60 * np.arange(6)
+
+by_time.plot(xticks = hourly_ticks, style = [":", "--", "-"])
+plt.show()
+plt.clf()
+```
+
+How does traffic look across week days?
+
+```{python}
+by_weekday = (
+  data
+  .groupby(data.index.dayofweek)
+  .mean()
+)
+
+by_weekday.index = ["Mon", "Tues", "Wed", "Thurs", "Fri", "Sat", "Sun"]
+
+by_weekday.plot(style = [":", "--", "-"])
+plt.show()
+plt.clf()
+```
+
+Now let's look at the hourly trend by weekdays vs weekends:
+
+```{python}
+weekend = np.where(data.index.weekday < 5, "Weekday", "Weekend")
+weekend
+
+by_time = data.groupby([weekend, data.index.time]).mean()
+by_time
+
+fig, ax = plt.subplots(1, 2, figsize=(14, 5))
+by_time.ix['Weekday'].plot(ax=ax[0], title='Weekdays',
+                           xticks=hourly_ticks, style=[':', '--', '-'])
+by_time.ix['Weekend'].plot(ax=ax[1], title='Weekends',
+                           xticks=hourly_ticks, style=[':', '--', '-']);
+plt.show()
+plt.clf()
+```
+
+# High-Performance Pandas: `eval()` and `query()`
+
+## Motivating `query()` and `eval()`: Compound Expressions
+
+## `pandas.eval()` for Efficient Operations
+
+The `eval()` function in Pandas uses string expression to efficiently compute operations using `DataFrame`s:
+
+```{python}
+import pandas as pd
+nrows, ncols = 100000, 100
+rng = np.random.RandomState(42)
+df1, df2, df3, df4 = (pd.DataFrame(rng.rand(nrows, ncols))
+                      for i in range(4))
+```
+
+\

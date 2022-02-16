@@ -1,0 +1,47 @@
+---
+title: "Chapter 4: Visualization with Matplotlib"
+output: html_notebook
+---
+
+Matplotlib is a multi-platform data visualization library build on NumPy arrays, and designed to work with the broader SciPy stack.
+
+## General Matplotlib Tips
+
+### Importing Matplotlib
+
+The standard shorthands for Matplotlib are:
+
+```{python}
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+```
+
+The `plt` interface is what we will use most often, as we shall see throughout the chapter.
+
+### Setting Styles
+
+We will use the `plt.style` directive to choose an aesthetic style for our figures.
+
+```{python}
+plt.style.use("classic")
+```
+
+### `show()` or No `show()`? How to Display Your Plots
+
+There are three contexts when using Matplotlib, a script, in an IPython terminal, or in an IPython notebook.
+
+#### Plotting from a script
+
+If you are using Matplotlib within a scrupt, the function `plt.show()` is your friend. It starts an event loop, looks for all currently active figure objects, and opens one or more interactive windows that display your figure or figures. For example:
+
+```{python}
+import matplotlib.pyplot as plt
+import numpy as np
+
+x = np.linspace(0, 10, 100)
+
+plt.plot(x, np.sin(x))
+plt.plot(x, np.cos(x))
+
+plt.show()
+```
